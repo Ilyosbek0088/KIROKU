@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#120b20" id="metaTheme">
+<title>KIROKU by Ilya | ANILIST</title>
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23d94cff'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%2324082e'%3E記%3C/text%3E%3C/svg%3E">
+<script>
+/* Apply the last used theme immediately so there is no colour flash on load. */
+try{var t=localStorage.getItem("kiroku_theme_last");if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+/* ============================================================
+   THEMES — every colour in the site comes from these variables.
+   --a / --b : main and secondary accent      --k1..k3 : background blob colours
+   ============================================================ */
+:root,html[data-theme="sakura"]{--a:#d94cff;--b:#ff9bd6;--a-rgb:217,76,255;--b-rgb:255,155,214;--ink:#24082e;--base1:#080611;--base2:#160a26;--k1:156,53,255;--k2:255,92,174;--k3:106,76,255;--text:#fff3ff;--muted:#b9a3c6;--field:10,7,19}
+html[data-theme="forest"]{--a:#35c878;--b:#a5f5c2;--a-rgb:53,200,120;--b-rgb:165,245,194;--ink:#062014;--base1:#050d0a;--base2:#0b1f15;--k1:31,168,96;--k2:141,240,180;--k3:22,138,106;--text:#effff5;--muted:#9ab5a5;--field:6,16,11}
+html[data-theme="midnight"]{--a:#aeb9d0;--b:#e1e6f2;--a-rgb:174,185,208;--b-rgb:225,230,242;--ink:#090d17;--base1:#040508;--base2:#11141c;--k1:107,122,153;--k2:69,78,103;--k3:135,150,181;--text:#f1f4fb;--muted:#9fa8ba;--field:6,7,11}
+html[data-theme="ember"]{--a:#ff8a32;--b:#ffd08a;--a-rgb:255,138,50;--b-rgb:255,208,138;--ink:#2b1204;--base1:#100804;--base2:#261107;--k1:255,138,50;--k2:255,208,138;--k3:194,65,12;--text:#fff4e8;--muted:#bba892;--field:15,8,4}
+:root{--line:rgba(var(--a-rgb),.24);--surf:linear-gradient(135deg,rgba(var(--a-rgb),.13),rgba(var(--field),.74));--shadow:0 24px 80px rgba(0,0,0,.55)}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:90px;min-height:100%;background-color:var(--base1);background-image:radial-gradient(ellipse at 8% 6%,rgba(var(--k1),.26),transparent 36%),radial-gradient(ellipse at 94% 16%,rgba(var(--k2),.16),transparent 32%),linear-gradient(135deg,var(--base1),var(--base2) 50%,var(--base1));background-attachment:fixed}
+body{margin:0;background:transparent;color:var(--text);font-family:"DM Sans",sans-serif;min-height:100vh;overflow-x:hidden}
+body.locked{overflow:hidden}
+body.locked .nav-wrap,body.locked main{filter:blur(7px);pointer-events:none;user-select:none}
+button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default}
+h1,h2,h3,p{margin-top:0}
+.hidden{display:none!important}
+
+/* ---------- Background blobs: they take turns, one after another ---------- */
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora:after{content:"";position:absolute;inset:0;opacity:.06;background-image:linear-gradient(rgba(var(--b-rgb),1) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--b-rgb),1) 1px,transparent 1px);background-size:54px 54px}
+.aurora-inner{position:absolute;inset:0;transform:translate3d(var(--px,0px),var(--py,0px),0);transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+/* Each blob: its own flowing path + a slowly morphing, rotating shape + its turn to glow. */
+.blob{position:absolute;left:0;top:0;width:clamp(340px,56vmax,820px);aspect-ratio:1;border-radius:50%;opacity:.2;will-change:transform,opacity,border-radius;animation:blobPath1 30s ease-in-out infinite,blobTurn 24s ease-in-out infinite,blobMorph 16s ease-in-out infinite alternate}
+.b1{background:radial-gradient(circle at 40% 38%,rgba(var(--b-rgb),.5),rgba(var(--k1),.85) 28%,rgba(var(--k1),.25) 52%,transparent 72%)}
+.b2{background:radial-gradient(circle at 60% 42%,rgba(var(--b-rgb),.45),rgba(var(--k2),.85) 28%,rgba(var(--k2),.25) 52%,transparent 72%);animation-name:blobPath2,blobTurn,blobMorph;animation-delay:-10s,-16s,-5s}
+.b3{background:radial-gradient(circle at 50% 60%,rgba(var(--b-rgb),.4),rgba(var(--k3),.85) 28%,rgba(var(--k3),.25) 52%,transparent 72%);animation-name:blobPath3,blobTurn,blobMorph;animation-delay:-20s,-8s,-10s}
+@keyframes blobPath1{0%,100%{transform:translate(-18vw,-20vh)}20%{transform:translate(48vw,-24vh)}40%{transform:translate(72vw,22vh)}60%{transform:translate(40vw,62vh)}80%{transform:translate(-12vw,40vh)}}
+@keyframes blobPath2{0%,100%{transform:translate(70vw,60vh)}25%{transform:translate(20vw,70vh)}50%{transform:translate(-15vw,20vh)}75%{transform:translate(40vw,-18vh)}}
+@keyframes blobPath3{0%,100%{transform:translate(30vw,30vh)}20%{transform:translate(-10vw,50vh)}45%{transform:translate(30vw,75vh)}70%{transform:translate(75vw,30vh)}}
+@keyframes blobMorph{0%{border-radius:50%;rotate:0deg}33%{border-radius:62% 38% 55% 45%/45% 58% 42% 55%;rotate:40deg}66%{border-radius:42% 58% 38% 62%/58% 42% 60% 40%;rotate:90deg}100%{border-radius:55% 45% 62% 38%/40% 60% 45% 55%;rotate:140deg}}
+/* Each blob swells and glows in its own turn: 1 → 2 → 3 → 1 … */
+@keyframes blobTurn{0%{opacity:.2;scale:.86}10%{opacity:.7;scale:1.15}33%{opacity:.2;scale:.86}100%{opacity:.2;scale:.86}}
+
+/* ---------- Navigation ---------- */
+.nav-wrap{position:sticky;top:0;z-index:40;background:rgba(var(--field),.74);backdrop-filter:blur(22px) saturate(150%);border-bottom:1px solid var(--line);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.nav{max-width:1200px;margin:auto;min-height:76px;padding:0 24px;display:flex;align-items:center;gap:clamp(8px,1.5vw,22px)}
+.brand{display:flex;align-items:center;gap:10px;font:700 21px "Space Grotesk";letter-spacing:-.06em;color:var(--text);text-decoration:none;white-space:nowrap}
+.brand-mark{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--b),var(--a));color:var(--ink);box-shadow:0 7px 25px rgba(var(--a-rgb),.4)}
+.brand-dot{color:var(--b)}
+.brand-jp{font:600 10px "DM Sans";letter-spacing:.12em;color:var(--b);border-left:1px solid var(--line);padding-left:10px;margin-left:2px}
+.nav-links{position:relative;isolation:isolate;display:flex;align-items:center;gap:7px;flex:1;min-width:0}
+.nav-link{position:relative;z-index:1;border:0;background:transparent;color:var(--muted);padding:10px 13px;border-radius:10px;font-size:13px;font-weight:700;white-space:nowrap;transition:color .2s}
+.nav-link:hover,.nav-link.active{color:var(--b)}
+.nav-links:before{content:"";position:absolute;z-index:0;left:var(--nav-x,0);top:50%;width:var(--nav-w,0);height:42px;transform:translateY(-50%);border-radius:12px;background:linear-gradient(120deg,rgba(var(--a-rgb),.2),rgba(var(--b-rgb),.1));border:1px solid var(--line);box-shadow:0 0 24px rgba(var(--a-rgb),.2);opacity:0;transition:left .38s cubic-bezier(.2,.8,.2,1),width .38s cubic-bezier(.2,.8,.2,1),opacity .2s}
+.nav-links.has-indicator:before{opacity:1}
+.nav-actions{display:flex;gap:9px;align-items:center;flex-shrink:0}
+.mobile-menu{display:none}
+
+/* ---------- Buttons & fields ---------- */
+.btn{border:1px solid var(--line);background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(var(--a-rgb),.05));color:var(--text);padding:11px 15px;border-radius:11px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .2s,border-color .2s,background .2s,box-shadow .2s;white-space:nowrap;backdrop-filter:blur(12px)}
+.btn:hover{transform:translateY(-3px);border-color:rgba(var(--b-rgb),.55);background:rgba(var(--a-rgb),.14);box-shadow:0 10px 30px rgba(var(--a-rgb),.2)}
+.btn.primary{background:linear-gradient(115deg,var(--b),var(--a));color:var(--ink);border:0;box-shadow:0 10px 28px rgba(var(--a-rgb),.35)}
+.btn.primary:hover{filter:brightness(1.08);box-shadow:0 14px 36px rgba(var(--a-rgb),.5)}
+.btn.small{padding:8px 11px;font-size:12px}.btn.ghost{background:transparent}
+.invite-button{border-color:rgba(var(--b-rgb),.4);color:var(--b)}
+.btn svg,.icon-btn svg{width:16px;height:16px}
+.icon-btn{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--muted);transition:.2s}
+.icon-btn:hover:not(:disabled){color:var(--b);background:rgba(var(--a-rgb),.12);border-color:var(--line);transform:translateY(-2px)}
+.icon-btn:disabled{opacity:.28}
+.icon-btn.fav-on{color:var(--b)}.icon-btn.fav-on svg{fill:var(--b)}
+.field{width:100%;background:rgba(var(--field),.75);border:1px solid var(--line);border-radius:11px;padding:12px 13px;color:var(--text);outline:none;transition:.2s}
+.field:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(var(--a-rgb),.2)}
+.field::placeholder{color:rgba(var(--b-rgb),.38)}
+select.field option{background:#120b20;color:#fff}
+.premium-badge{display:inline-flex;align-items:center;border:1px solid var(--line);background:rgba(var(--a-rgb),.12);color:var(--b);border-radius:999px;padding:3px 7px;font-size:9px;font-weight:800;letter-spacing:.08em;margin-left:5px}
+.user-dev-icon{color:#ffcc72;filter:drop-shadow(0 0 8px #ffcc72)}
+
+/* ---------- Layout ---------- */
+main{max-width:1200px;margin:auto;padding:0 24px 80px}
+.eyebrow{color:var(--b);font:700 11px "Space Grotesk";letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.eyebrow:before{content:"";width:22px;height:1px;background:var(--b)}
+.hero{padding:62px 0 42px;display:grid;grid-template-columns:1.15fr .85fr;gap:35px;align-items:center}
+h1{font:700 clamp(48px,7vw,86px)/.98 "Space Grotesk";letter-spacing:-.075em;margin:18px 0}
+.gradient{background:linear-gradient(100deg,var(--text) 0%,var(--b) 45%,var(--a) 100%);color:transparent;-webkit-background-clip:text;background-clip:text}
+.hero-copy{color:var(--muted);max-width:560px;line-height:1.8;font-size:15px}
+.hero-actions{display:flex;gap:11px;flex-wrap:wrap;margin-top:25px}
+.hero-art{min-height:330px;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;isolation:isolate}
+.hero-art:before{content:"";position:absolute;width:min(340px,78vw);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(var(--a-rgb),.2),rgba(var(--b-rgb),.08) 55%,transparent 72%);filter:blur(18px);z-index:-1;animation:glowBreathe 7s ease-in-out infinite}
+.kanji-stage{position:relative;width:min(340px,80vw);aspect-ratio:1;display:grid;place-items:center;perspective:900px}
+.kanji-tilt{display:grid;place-items:center;transform:rotateX(var(--ty,0deg)) rotateY(var(--tx,0deg));transition:transform .25s ease-out;animation:kanjiIntro 1.6s cubic-bezier(.2,.8,.2,1) both}
+.kanji-aura{font-family:serif;font-size:clamp(180px,24vw,290px);line-height:.85;color:transparent;background:linear-gradient(115deg,var(--text) 0%,var(--b) 25%,var(--a) 50%,var(--b) 75%,var(--text) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;user-select:none;animation:kanjiFloat 8s ease-in-out 1.6s infinite,kanjiShine 7s linear infinite,kanjiGlow 5s ease-in-out infinite}
+.orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(var(--b-rgb),.28);animation:spin 22s linear infinite}
+.orbit:before{content:"";position:absolute;top:-4px;left:50%;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--b);box-shadow:0 0 14px 3px rgba(var(--b-rgb),.7)}
+.orbit.o2{inset:12%;border-style:solid;border-color:rgba(var(--a-rgb),.22);animation-duration:15s;animation-direction:reverse}
+.orbit.o2:before{background:var(--a);box-shadow:0 0 14px 3px rgba(var(--a-rgb),.7)}
+.spark{position:absolute;font-style:normal;color:var(--b);text-shadow:0 0 12px var(--b);opacity:0;animation:twinkle 3.6s ease-in-out infinite}
+.s1{top:8%;left:14%}.s2{top:18%;right:8%;font-size:14px;animation-delay:-1.2s}.s3{bottom:14%;left:6%;font-size:12px;animation-delay:-2.2s}.s4{bottom:8%;right:16%;animation-delay:-.6s}
+@keyframes spin{to{rotate:360deg}}
+@keyframes twinkle{0%,100%{opacity:0;scale:.4}50%{opacity:1;scale:1.2}}
+@keyframes kanjiIntro{from{opacity:0;scale:.7;filter:blur(18px)}to{opacity:1;scale:1;filter:blur(0)}}
+@keyframes kanjiShine{from{background-position:0% 0}to{background-position:250% 0}}
+@keyframes kanjiGlow{0%,100%{filter:drop-shadow(0 15px 30px rgba(var(--a-rgb),.3))}50%{filter:drop-shadow(0 15px 55px rgba(var(--b-rgb),.65))}}
+.hero-art-caption{display:flex;gap:13px;align-items:center;font:700 11px "Space Grotesk";letter-spacing:.25em;color:var(--text)}
+.hero-art-caption i{font-style:normal;color:var(--b);text-shadow:0 0 14px var(--b)}
+.hero-art-sub{font:10px "Space Grotesk";letter-spacing:.28em;color:var(--muted)}
+@keyframes glowBreathe{50%{transform:scale(1.12);opacity:.65}}
+@keyframes kanjiFloat{0%,100%{translate:0 0;rotate:-3deg}50%{translate:0 -12px;rotate:2deg}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 34px}
+.stat,.feature,.tier,.premium,.modal,.gate-card,.theme-studio,.premium-member-note{background:var(--surf);border:1px solid var(--line);backdrop-filter:blur(18px);box-shadow:0 18px 48px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.05)}
+.stat{padding:17px 19px;border-radius:15px}.stat strong{display:block;font:700 25px "Space Grotesk"}.stat span{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:45px 0 17px}
+.section-title h2{font:700 28px "Space Grotesk";letter-spacing:-.05em;margin:0}
+.section-title p{color:var(--muted);font-size:12px;margin:6px 0 0}
+.toolbar{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto auto;gap:12px;align-items:center;margin-bottom:17px}
+.search{position:relative;min-width:0}
+.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none}
+.search .field{height:48px;padding:12px 15px 12px 46px}
+.toolbar>.select,.toolbar>.btn{height:48px}.select{width:170px;max-width:100%}
+
+/* ---------- Tier cards ---------- */
+.tier-list{display:grid;gap:12px}
+.tier{display:grid;grid-template-columns:62px minmax(0,1fr);border-radius:17px;overflow:hidden;transition:transform .38s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s}
+.tier:hover{transform:translateY(-5px);border-color:rgba(var(--b-rgb),.5);box-shadow:0 23px 55px rgba(0,0,0,.55),0 0 25px rgba(var(--a-rgb),.15)}
+.rank{display:grid;place-items:center;background:rgba(255,255,255,.04);border-right:1px solid var(--line);font:700 30px "Space Grotesk";color:var(--muted)}
+.tier[data-rank="1"] .rank{background:linear-gradient(155deg,var(--b),var(--a));color:var(--ink)}
+.tier[data-rank="2"] .rank{background:linear-gradient(155deg,rgba(var(--b-rgb),.8),rgba(var(--a-rgb),.55));color:var(--ink)}
+.tier[data-rank="3"] .rank{background:linear-gradient(155deg,rgba(var(--b-rgb),.55),rgba(var(--a-rgb),.38));color:var(--ink)}
+.entry{min-width:0;display:grid;grid-template-columns:94px minmax(0,1fr) auto;align-items:center;gap:17px;padding:13px 17px}
+.poster{width:94px;height:112px;border-radius:10px;overflow:hidden;position:relative;flex-shrink:0;background:linear-gradient(145deg,rgba(var(--a-rgb),.3),rgba(var(--field),.9));border:1px solid var(--line);box-shadow:0 10px 28px rgba(0,0,0,.5)}
+.poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;transition:transform .4s}
+.tier:hover .poster img{transform:scale(1.06)}
+.poster-fallback{position:absolute;inset:0;z-index:1;display:grid;place-items:center;text-align:center;padding:8px;color:var(--b);font:700 13px "Space Grotesk";overflow-wrap:anywhere}
+.info{min-width:0}
+.number{font:10px "Space Grotesk";letter-spacing:.14em;color:var(--b);text-transform:uppercase}
+.name{font:700 clamp(20px,3vw,27px) "Space Grotesk";letter-spacing:-.04em;margin:5px 0;overflow-wrap:anywhere}
+.note{color:var(--muted);font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.tag{display:inline-flex;margin-top:9px;border:1px solid var(--line);background:rgba(var(--a-rgb),.07);border-radius:6px;padding:5px 8px;color:var(--text);font:10px "Space Grotesk";letter-spacing:.07em}
+.card-actions{display:flex;gap:6px;align-self:start;flex-wrap:wrap}
+.empty{padding:35px;text-align:center;border:1px dashed var(--line);border-radius:16px;color:var(--muted);line-height:1.6}
+
+/* ---------- Features / premium ---------- */
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:20px}
+.feature{padding:21px;border-radius:16px;transition:.25s}
+.feature:hover{transform:translateY(-6px);border-color:rgba(var(--b-rgb),.45);box-shadow:0 24px 55px rgba(0,0,0,.5),0 0 28px rgba(var(--a-rgb),.15)}
+.feature-icon{width:39px;height:39px;border-radius:12px;background:rgba(var(--a-rgb),.15);color:var(--b);display:grid;place-items:center;margin-bottom:16px}
+.feature h3{font:700 16px "Space Grotesk";margin-bottom:7px}.feature p{color:var(--muted);font-size:12px;line-height:1.7;margin:0}
+.premium{margin:60px 0 30px;padding:34px;border-radius:22px;display:flex;justify-content:space-between;align-items:center;gap:25px;background:radial-gradient(circle at 90% 0%,rgba(var(--b-rgb),.16),transparent 38%),var(--surf)}
+.premium h2{font:700 30px "Space Grotesk";letter-spacing:-.05em;margin:10px 0}.premium p{color:var(--muted);font-size:13px;line-height:1.7;max-width:600px;margin:0}.premium .btn{flex-shrink:0}
+.premium-member-note{display:flex;gap:16px;align-items:center;margin:22px 0;padding:20px 23px;border-radius:17px;animation:noticeIn .6s both}
+.member-note-mark{font-size:30px;color:var(--b);text-shadow:0 0 22px var(--a)}
+.premium-member-note p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.premium-list{display:grid;gap:10px;margin:20px 0}.premium-list div{display:flex;gap:9px;align-items:center;font-size:13px}.premium-list svg{color:var(--b);width:17px}
+.support-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.support-links a,.footer-right a{color:var(--b);text-decoration:none;border-bottom:1px solid rgba(var(--b-rgb),.35);padding-bottom:2px}
+.support-links a:hover,.footer-right a:hover{color:var(--text);border-color:var(--text)}
+
+/* ---------- Theme studio ---------- */
+.theme-studio{display:none;margin:24px 0;padding:24px;border-radius:22px}
+.theme-studio.on{display:block}
+.theme-studio-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:18px}
+.theme-studio h3{font:700 22px "Space Grotesk";margin:8px 0}.theme-studio p{color:var(--muted);font-size:13px;margin:0}
+.theme-lock{white-space:nowrap;color:var(--b);border:1px solid var(--line);background:rgba(var(--a-rgb),.12);border-radius:99px;padding:7px 10px;font-size:10px;font-weight:800;letter-spacing:.08em}
+.theme-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.theme-option{min-width:0;text-align:left;color:var(--text);background:rgba(var(--field),.5);border:1px solid var(--line);border-radius:15px;padding:12px;transition:transform .25s,border-color .25s,box-shadow .25s}
+.theme-option:hover{transform:translateY(-4px);border-color:var(--a);box-shadow:0 12px 28px rgba(var(--a-rgb),.3)}
+.theme-option.active{border-color:var(--b);box-shadow:0 0 0 1px var(--b),0 10px 28px rgba(var(--a-rgb),.35)}
+.theme-option strong,.theme-option small{display:block;overflow-wrap:anywhere}.theme-option strong{font-size:13px;margin-top:10px}.theme-option small{color:var(--muted);font-size:11px;margin-top:3px}
+.theme-swatch{display:block;height:56px;border-radius:9px;border:1px solid rgba(255,255,255,.15)}
+.sw-sakura{background:radial-gradient(circle at 75% 20%,#ff9bd6,transparent 40%),linear-gradient(120deg,#22083d,#8e35bc 55%,#f36cba)}
+.sw-forest{background:radial-gradient(circle at 75% 20%,#8df0b4,transparent 40%),linear-gradient(120deg,#061b12,#16784d 55%,#8df0b4)}
+.sw-midnight{background:radial-gradient(circle at 75% 20%,#d4d8e4,transparent 40%),linear-gradient(120deg,#050609,#242936 55%,#747e91)}
+.sw-ember{background:radial-gradient(circle at 75% 20%,#ffd17c,transparent 40%),linear-gradient(120deg,#241007,#a94c1b 55%,#ffb04f)}
+.theme-status{margin-top:14px!important;color:var(--b)!important}
+
+/* ---------- Footer, modals, gate, toast ---------- */
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.footer-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.easter-egg{border:1px solid var(--line);background:rgba(var(--a-rgb),.12);color:var(--b);border-radius:50%;width:21px;height:21px;margin-left:6px;font-size:11px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(5,2,10,.72);backdrop-filter:blur(12px);z-index:100;display:none;place-items:center;padding:18px}
+.modal-backdrop.open{display:grid;animation:appear .2s}
+.modal{width:min(520px,100%);max-height:90vh;overflow:auto;border-radius:20px;padding:24px;background:linear-gradient(145deg,rgba(var(--a-rgb),.16),rgba(var(--field),.96));box-shadow:var(--shadow)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.modal-head h2{font:700 23px "Space Grotesk";margin:0}
+.close{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted);width:34px;height:34px;border-radius:9px;display:grid;place-items:center}
+.form-grid{display:grid;gap:12px}.form-label{font-size:11px;color:var(--b);font-weight:700;display:grid;gap:7px}
+.form-help{font-size:10px;color:var(--muted);line-height:1.5}.modal .btn{width:100%;margin-top:7px}
+.welcome-modal{text-align:center;width:min(430px,100%)}.welcome-modal h2{font:700 28px "Space Grotesk";margin:10px 0}.welcome-symbol{font-size:42px;margin-bottom:14px}
+.welcome-message{color:var(--muted);line-height:1.75;font-size:13px;margin-bottom:24px}
+.login-gate{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:22px;overflow:auto;background:radial-gradient(ellipse at 12% 12%,rgba(var(--k1),.3),transparent 36%),radial-gradient(ellipse at 88% 86%,rgba(var(--k2),.2),transparent 38%),rgba(var(--field),.95);backdrop-filter:blur(18px)}
+.gate-card{width:min(460px,100%);padding:clamp(24px,5vw,42px);border-radius:26px;box-shadow:0 35px 110px rgba(0,0,0,.7),0 0 65px rgba(var(--a-rgb),.15);animation:appear .5s both}
+.gate-brand{display:flex;align-items:center;gap:12px;font:700 24px "Space Grotesk";margin-bottom:35px}
+.gate-brand small{margin-left:auto;font:700 9px "Space Grotesk";letter-spacing:.16em;color:var(--muted)}
+.gate-card h1{font-size:clamp(44px,10vw,62px);margin:13px 0}
+.gate-copy{color:var(--muted);line-height:1.75;font-size:13px;margin-bottom:24px}.gate-help{margin-top:18px}
+.gate-foot{border-top:1px solid var(--line);padding-top:17px;margin-top:25px;color:var(--muted);font:700 9px "Space Grotesk";letter-spacing:.2em}
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);max-width:calc(100vw - 30px);text-align:center;color:var(--text);background:rgba(var(--field),.95);border:1px solid var(--line);padding:12px 17px;border-radius:11px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:300;backdrop-filter:blur(18px);box-shadow:0 14px 42px rgba(0,0,0,.6),0 0 24px rgba(var(--a-rgb),.3)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.view-enter{animation:appear .48s cubic-bezier(.2,.8,.2,1) both}
+@keyframes appear{from{opacity:0;transform:translateY(16px);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes noticeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ---------- Responsive ---------- */
+@media(max-width:1100px){.nav-link{padding:9px 10px;font-size:12px}.nav-actions{gap:6px}.nav-actions .btn{padding:9px 10px}}
+@media(max-width:900px){.toolbar{grid-template-columns:minmax(0,1fr) auto}.toolbar .search{grid-column:1/-1}.entry{grid-template-columns:82px minmax(0,1fr) auto}.poster{width:82px;height:104px}}
+@media(max-width:760px){
+ .nav{min-height:70px;gap:9px;padding:0 14px}
+ .nav-links{display:none;position:absolute;top:calc(100% + 1px);left:12px;right:12px;padding:10px;background:rgba(var(--field),.97);border:1px solid var(--line);border-radius:0 0 16px 16px;flex-direction:column;align-items:stretch;gap:4px;box-shadow:0 18px 38px rgba(0,0,0,.5);z-index:30}
+ .nav-links.open{display:flex}.nav-links:before{display:none}
+ .nav-link{text-align:left;padding:12px 14px;font-size:14px}
+ .nav-link.active{background:linear-gradient(110deg,rgba(var(--a-rgb),.2),rgba(var(--b-rgb),.1));border:1px solid var(--line)}
+ .mobile-menu{display:grid;flex:0 0 38px;width:38px;height:38px;border:1px solid var(--line);background:rgba(var(--a-rgb),.1);color:var(--b)}
+ .nav-actions{margin-left:auto;gap:6px}.nav-actions .login-label,.nav-actions .premium-badge,.brand-jp,.logout-button span{display:none}
+ .nav-actions .btn{width:38px;height:38px;padding:8px;font-size:0;gap:0}
+ .hero{grid-template-columns:1fr;padding-top:38px}.hero-art{min-height:245px}.kanji-aura{font-size:210px}
+ .feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .premium{align-items:flex-start;flex-direction:column;padding:25px}
+ .theme-options{grid-template-columns:repeat(2,minmax(0,1fr))}.theme-studio{padding:17px}.theme-studio-head{display:block}.theme-lock{display:inline-block;margin-top:12px}
+}
+@media(max-width:560px){
+ main{padding:0 14px 55px}.brand{font-size:18px}
+ .toolbar{grid-template-columns:minmax(0,1fr);gap:9px}.toolbar .search{grid-column:auto}.toolbar>.select,.toolbar>.btn{width:100%;height:46px}.search .field{height:46px}
+ .section-title{align-items:flex-start;flex-direction:column}
+ .entry{grid-template-columns:66px minmax(0,1fr);gap:10px;padding:11px}.poster{width:66px;height:88px}.card-actions{grid-column:2;justify-self:start}
+ .tier{grid-template-columns:39px minmax(0,1fr)}.rank{font-size:21px}.note{font-size:11px}.name{font-size:19px}
+ .feature-grid{grid-template-columns:1fr}.hero h1{font-size:clamp(43px,13vw,58px)}.hero-art{min-height:215px}.kanji-aura{font-size:180px}
+ .stats{gap:6px}.stat{padding:12px 9px}.stat strong{font-size:19px}.stat span{font-size:8px;letter-spacing:.05em}
+ .gate-card{padding:23px;border-radius:20px}.gate-brand{font-size:21px;margin-bottom:28px}.gate-brand small{display:none}
+}
+@media(max-width:380px){.brand{font-size:16px}.hero-actions .btn{width:100%}.stats{grid-template-columns:1fr}.stat{display:flex;align-items:center;justify-content:space-between}.section-title h2{font-size:24px}}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+ .blob{opacity:.35}
+}
+</style>
+</head>
+<body class="locked">
+
+<div class="aurora" aria-hidden="true"><div class="aurora-inner" id="auroraInner"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div></div>
+
+<!-- LOGIN GATE -->
+<div class="login-gate" id="loginGate">
+ <div class="gate-card">
+  <div class="gate-brand"><span class="brand-mark"><i data-lucide="book-open"></i></span><span>KIROKU<span class="brand-dot">.</span></span><small>記録 · YOUR ANIME ARCHIVE</small></div>
+  <div class="eyebrow">Members only · Premium access</div>
+  <h1>Welcome <span class="gradient">back.</span></h1>
+  <p class="gate-copy">Sign in to enter your archive. Your ranking is private to your account in this browser.</p>
+  <form class="form-grid" id="loginForm">
+   <label class="form-label">Username<input class="field" id="gateUsername" autocomplete="username" required placeholder="Your username"></label>
+   <label class="form-label">Password<input class="field" id="gatePassword" type="password" autocomplete="current-password" required placeholder="Your password"></label>
+   <button class="btn primary" type="submit" id="loginButton"><i data-lucide="log-in"></i> Enter KIROKU</button>
+  </form>
+  <p class="form-help gate-help">Invited premium accounts are preloaded. New accounts can be created by signed-in premium members.</p>
+  <div class="gate-foot">和 · KEEP YOUR PEAKLIST CLOSE</div>
+ </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-backdrop" id="createUserModal"><div class="modal">
+ <div class="modal-head"><h2>Create a premium account ✦</h2><button class="close" data-close="createUserModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+ <form class="form-grid" id="createUserForm">
+  <label class="form-label">New username<input class="field" id="newUsername" required minlength="3" maxlength="28" autocomplete="off" placeholder="Choose a username"></label>
+  <label class="form-label">Password<input class="field" id="newPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></label>
+  <button class="btn primary" type="submit"><i data-lucide="user-plus"></i> Create premium account</button>
+ </form>
+ <p class="form-help">Premium members only. New accounts receive the premium badge and start with an empty personal ranking.</p>
+</div></div>
+
+<div class="modal-backdrop" id="welcomeNotice"><div class="modal welcome-modal">
+ <div class="welcome-symbol" id="welcomeSymbol">✦</div><div class="eyebrow">KIROKU · LOGIN NOTICE</div>
+ <h2 id="welcomeTitle">Welcome back</h2><p id="welcomeMessage" class="welcome-message"></p>
+ <button class="btn primary" data-close="welcomeNotice">Let's go <i data-lucide="arrow-right"></i></button>
+</div></div>
+
+<div class="modal-backdrop" id="cardModal"><div class="modal">
+ <div class="modal-head"><h2 id="cardModalTitle">Add a gem</h2><button class="close" data-close="cardModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+ <form class="form-grid" id="cardForm">
+  <label class="form-label">Anime title<input class="field" id="cardTitle" required maxlength="80" placeholder="e.g. Fullmetal Alchemist: Brotherhood"></label>
+  <label class="form-label">Short description<textarea class="field" id="cardNote" rows="2" maxlength="220" placeholder="Why is it on your list?"></textarea></label>
+  <label class="form-label">Tag<input class="field" id="cardTag" maxlength="35" placeholder="#1 · THE GOAT"></label>
+  <label class="form-label">Cover image URL <span class="form-help">Optional. Paste a direct image link, or upload below. With no cover, KIROKU looks one up automatically.</span><input class="field" id="cardImage" placeholder="https://..."></label>
+  <label class="form-label">Or upload poster <span class="form-help" id="cardImageHint"></span><input class="field" id="cardFile" type="file" accept="image/*"></label>
+  <button class="btn primary" type="submit"><i data-lucide="save"></i> Save card</button>
+ </form>
+</div></div>
+
+<div class="modal-backdrop" id="premiumModal"><div class="modal">
+ <div class="modal-head"><h2>Kiroku Premium ✦</h2><button class="close" data-close="premiumModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+ <p style="color:var(--muted);line-height:1.7">All invited accounts currently include the premium badge. For project support, contact @kirokuBYilyabot.</p>
+ <div class="premium-list"><div><i data-lucide="circle-check"></i> Exclusive profile themes</div><div><i data-lucide="circle-check"></i> More ranking lists</div><div><i data-lucide="circle-check"></i> Premium supporter badge</div></div>
+ <button class="btn primary" data-do="telegram"><i data-lucide="send"></i> Continue to Telegram</button>
+ <p class="form-help">No payment is collected on this demo site.</p>
+</div></div>
+
+<!-- NAV -->
+<div class="nav-wrap"><nav class="nav">
+ <a class="brand" href="#" data-go="home"><span class="brand-mark"><i data-lucide="book-open"></i></span>KIROKU<span class="brand-dot">.</span><span class="brand-jp">記録</span></a>
+ <div class="nav-links" id="navLinks">
+  <button class="nav-link active" data-view="home" data-go="home">Explore</button>
+  <button class="nav-link" data-view="builder" data-go="builder">My rankings</button>
+  <button class="nav-link" data-view="features" data-go="features">Features</button>
+  <button class="nav-link" data-view="premium" data-go="premium">Premium ✦</button>
+ </div>
+ <div class="nav-actions">
+  <button class="btn ghost small" id="userButton"><i data-lucide="user-round"></i><span class="login-label">Log in</span></button>
+  <button class="btn small logout-button" id="logoutButton" data-do="logout" style="display:none"><i data-lucide="log-out"></i><span>Log out</span></button>
+  <button class="btn primary small" data-do="add"><i data-lucide="plus"></i> My gems</button>
+  <button class="btn small invite-button" id="inviteButton" data-do="create-user"><i data-lucide="user-plus"></i> Add user</button>
+  <button class="icon-btn mobile-menu" id="menuButton" data-do="menu" aria-label="Open menu" aria-expanded="false"><i data-lucide="menu"></i></button>
+ </div>
+</nav></div>
+
+<main>
+<!-- HOME -->
+<section id="view-home" class="view">
+ <div class="hero">
+  <div>
+   <div class="eyebrow">アニメの記録 · YOUR TASTE, YOUR RULES</div>
+   <h1>CREATE YOUR<br><span class="gradient">LIST OF GEMS.</span></h1>
+   <p class="hero-copy">A personal archive for the shows that matter. Rank your favourites, give every gem its own cover, and export your peaklist whenever you want.</p>
+   <div class="hero-actions"><button class="btn primary" data-go="builder"><i data-lucide="layers"></i> Open my rankings</button><button class="btn" data-do="add"><i data-lucide="circle-plus"></i> Create your list of gems</button></div>
+  </div>
+  <div class="hero-art"><div class="kanji-stage" aria-hidden="true"><span class="orbit o1"></span><span class="orbit o2"></span><div class="kanji-tilt"><div class="kanji-aura">記</div></div><i class="spark s1">✦</i><i class="spark s2">✦</i><i class="spark s3">✦</i><i class="spark s4">✦</i></div><div class="hero-art-caption"><span>CREATE</span><i>✦</i><span>RANK</span><i>✦</i><span>SHARE</span></div><div class="hero-art-sub">YOUR STORY, YOUR ARCHIVE</div></div>
+ </div>
+ <div class="stats">
+  <div class="stat"><strong id="animeCount">0</strong><span>Anime in your list</span></div>
+  <div class="stat"><strong id="favoriteCount">0</strong><span>Favourites</span></div>
+  <div class="stat"><strong>∞</strong><span>Your ranking potential</span></div>
+ </div>
+ <div class="section-title"><div><h2>KIROKU showcase</h2><p id="showcaseNote">This tier list belongs to the developer, Ilya — only he can edit it. Like a gem? Add it to your own list.</p></div><button class="btn small" data-do="export"><i data-lucide="download"></i> Export peaklist</button></div>
+ <div class="toolbar">
+  <div class="search"><i data-lucide="search"></i><input class="field" id="searchInput" placeholder="Search anime..." autocomplete="off"></div>
+  <select class="field select" id="sortSelect"><option value="rank">Rank order</option><option value="az">A – Z</option><option value="favorites">Favourites first</option></select>
+ </div>
+ <div class="tier-list" id="tierList"></div>
+ <div class="premium"><div><div class="eyebrow">✦ Kiroku premium</div><h2>Make your rankings legendary.</h2><p>Unlock the premium experience: extra customization, more list slots, exclusive themes and a supporter badge. Contact us on Telegram to get access.</p></div><button class="btn primary" data-do="premium"><i data-lucide="crown"></i> Get Premium</button></div>
+</section>
+
+<!-- BUILDER -->
+<section id="view-builder" class="view hidden">
+ <div class="section-title"><div><div class="eyebrow">Your workspace</div><h2>My rankings</h2><p>Create your list of gems from zero. Add covers, notes, and your own ranking.</p></div><button class="btn primary" data-do="add"><i data-lucide="plus"></i> Add gem</button></div>
+ <div class="toolbar">
+  <div class="search"><i data-lucide="search"></i><input class="field" id="searchInput2" placeholder="Find a title..." autocomplete="off"></div>
+  <select class="field select" id="sortSelect2"><option value="rank">Rank order</option><option value="az">A – Z</option><option value="favorites">Favourites first</option></select>
+  <button class="btn" data-do="export"><i data-lucide="download"></i> Export peaklist</button>
+  <button class="btn" data-do="import-json"><i data-lucide="upload"></i> Import JSON</button>
+  <button class="btn" data-do="copy-text"><i data-lucide="clipboard-copy"></i> Copy as text</button>
+  <input id="jsonImport" type="file" accept=".json,application/json" class="hidden">
+ </div>
+ <div class="tier-list" id="tierList2"></div>
+</section>
+
+<!-- FEATURES -->
+<section id="view-features" class="view hidden">
+ <div class="section-title"><div><div class="eyebrow">Made for anime fans</div><h2>Small tools. Big opinions.</h2><p>Useful ways to keep your anime universe organised.</p></div></div>
+ <div class="feature-grid">
+  <div class="feature"><div class="feature-icon"><i data-lucide="image-plus"></i></div><h3>Custom posters</h3><p>Paste a direct cover image URL or upload a cover from your device. Each card can have its own artwork.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="arrow-up-down"></i></div><h3>Reorder your list</h3><p>Move anime up or down to fine-tune your ranking without rebuilding the whole list.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="heart"></i></div><h3>Favourite picks</h3><p>Star the shows you love and filter your list to find them quickly.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="search"></i></div><h3>Instant search</h3><p>Search titles, notes and tags as your collection grows.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="file-json"></i></div><h3>Backup & restore</h3><p>Export your list as JSON and import it later or move it to another device.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="share-2"></i></div><h3>Shareable direction</h3><p>Copy a text version of your ranking to share with friends or post in your community.</p></div>
+ </div>
+ <div class="premium"><div><div class="eyebrow">✦ Support the project</div><h2>Want the premium badge?</h2><p>Premium access is currently handled manually. Message the project owner on Telegram for details.</p></div><button class="btn primary" data-do="premium"><i data-lucide="send"></i> Telegram</button></div>
+</section>
+
+<!-- PREMIUM -->
+<section id="view-premium" class="view hidden">
+ <div class="section-title"><div><div class="eyebrow">Kiroku plus ✦</div><h2>Go beyond the ranking.</h2><p>Support development and unlock extra ways to show off your taste.</p></div></div>
+ <div class="premium-member-note hidden" id="premiumMemberNote"><span class="member-note-mark">✦</span><div><strong>You're already a Premium member.</strong><p>Enjoy your perks, keep creating, and make every list a little masterpiece.</p></div></div>
+ <div class="theme-studio" id="themeStudio">
+  <div class="theme-studio-head"><div><div class="eyebrow">Personalize KIROKU</div><h3>Choose your atmosphere</h3><p>Switch themes any time. Your choice is saved on this browser, per account.</p></div><span class="theme-lock">✦ PREMIUM</span></div>
+  <div class="theme-options">
+   <button class="theme-option" type="button" data-theme-pick="sakura"><span class="theme-swatch sw-sakura"></span><strong>Sakura Night</strong><small>Purple · Pink</small></button>
+   <button class="theme-option" type="button" data-theme-pick="forest"><span class="theme-swatch sw-forest"></span><strong>Forest</strong><small>Emerald · Mint</small></button>
+   <button class="theme-option" type="button" data-theme-pick="midnight"><span class="theme-swatch sw-midnight"></span><strong>Midnight</strong><small>Black · Silver</small></button>
+   <button class="theme-option" type="button" data-theme-pick="ember"><span class="theme-swatch sw-ember"></span><strong>Ember</strong><small>Orange · Amber</small></button>
+  </div>
+  <p class="theme-status" id="themeStatus" aria-live="polite">Sakura Night is active.</p>
+ </div>
+ <div class="feature-grid">
+  <div class="feature"><div class="feature-icon"><i data-lucide="palette"></i></div><h3>Exclusive themes</h3><p>More colour palettes and profile styling.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="list-plus"></i></div><h3>More list slots</h3><p>Keep separate rankings for genres, seasons or all-time favourites.</p></div>
+  <div class="feature"><div class="feature-icon"><i data-lucide="badge-check"></i></div><h3>Premium profile badge</h3><p>Show support for the project with a special supporter mark.</p></div>
+ </div>
+ <div class="premium" style="margin-top:25px"><div><div class="eyebrow">Manual activation</div><h2>Get Kiroku Premium</h2><p>Tap below to contact us on Telegram. We'll share the current price and activation details there.</p></div><button class="btn primary" data-do="telegram"><i data-lucide="send"></i> Contact on Telegram</button></div>
+ <div class="support-links"><a href="https://t.me/kirokuBYilyabot" target="_blank" rel="noopener">Project support · @kirokuBYilyabot</a><a href="https://t.me/naeci_NZ" target="_blank" rel="noopener">Report bugs · @naeci_NZ</a></div>
+</section>
+
+<footer><span>© 2026 KIROKU · アニメの記録</span><span class="footer-right"><a href="https://t.me/kirokuBYilyabot" target="_blank" rel="noopener">Support</a><a href="https://t.me/naeci_NZ" target="_blank" rel="noopener">Report a bug</a><span>Made by Ilya · 和の記録 ✦ <button class="easter-egg" data-do="easter" title="A tiny secret" aria-label="A tiny secret">?</button></span></span></footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+// KIROKU — local-browser prototype. Accounts and lists live in this browser only;
+// this is NOT secure server authentication.
+
+/* ---------------- Settings & data ---------------- */
+const TELEGRAM = "https://t.me/kirokuBYilyabot";
+// Paste a direct image link here (e.g. https://i.pinimg.com/....png) to use it as the browser-tab icon.
+// Leave it empty to use the built-in icon that follows your theme colours.
+const FAVICON_URL = "";
+
+const THEMES = {
+ sakura:{name:"Sakura Night",color:"#120b20"},
+ forest:{name:"Forest",color:"#0b1f15"},
+ midnight:{name:"Midnight",color:"#11141c"},
+ ember:{name:"Ember",color:"#261107"}
+};
+
+const SEEDS = [
+ {username:"ilyadepp10",hash:"a66ff79b6a4dc427e65a84ffc8e82341496e17ad0e50bc20845966fbaa458e59",role:"admin",premium:true,icon:"code"},
+ {username:"ibrohimT",hash:"405d1e68397166beb221f78f1e55b21604c07c233305b4347395e79e088d43b7",role:"member",premium:true,icon:"user-round"},
+ {username:"asad_fem",hash:"df8e0e1095ed5c5cf19af1c33c2f17c41fde9bfd1d334f166e1d94128a9d7c82",role:"member",premium:true,icon:"flower-2",suffix:"🌸"},
+ {username:"am0gus_sus_thelaststand1",hash:"35019b82fb0099f710a19f6fc8d8b288638fc590efc2e8fc4828cd7af92aa890",role:"member",premium:true,icon:"user-round"}
+];
+
+const starterAnime = [
+ {id:"a1",title:"Mushoku Tensei",search:"Mushoku Tensei: Jobless Reincarnation",note:"The GOAT. Worldbuilding, character growth, and the personal #1.",tag:"#1 · THE GOAT",image:"https://preview.redd.it/new-key-visual-for-mushoku-tensei-jobless-reincarnation-v0-ea8xpa32i22h1.jpeg?width=640&crop=smart&auto=webp&s=78a8fc0f2982106f1f2cb3c1d59b1f13f402f0c2",favorite:true},
+ {id:"a2",title:"The Eminence in Shadow",search:"Kage no Jitsuryokusha ni Naritakute",note:"Style, atmosphere, and Cid doing Cid things. Extreme-diff contender.",tag:"#2 · AURA",image:"https://cdn.myanimelist.net/images/anime/1874/121869l.jpg",favorite:false},
+ {id:"a3",title:"Re:Zero",search:"Re:Zero kara Hajimeru Isekai Seikatsu",note:"Peak seasons, unforgettable ideas, and future arcs with huge potential.",tag:"#3 · PEAK POTENTIAL",image:"https://preview.redd.it/re-zero-season-4-new-key-visual-v0-quxstf76kjng1.jpeg?auto=webp&s=16b6e1853076df8885c61caaebd9eb2abc54c43e",favorite:false},
+ {id:"a4",title:"KONOSUBA",search:"Kono Subarashii Sekai ni Shukufuku wo",note:"Fun and unforgettable anime with a lot of chaos.",tag:"#4 · KEKS",image:"https://preview.redd.it/konosuba-season-3-key-visual-v0-nl2p6q90sqgc1.jpeg?width=640&crop=smart&auto=webp&s=6ea1b6a4d3940fcab61645e702f867caeb6f6e7d",favorite:false},
+ {id:"a5",title:"Hunter × Hunter",search:"Hunter x Hunter 2011",note:"A heavyweight adventure with some unforgettable arcs.",tag:"#5 · H×H",image:"https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx11061-sIpBprNRfzCe.png",favorite:false},
+ {id:"a6",title:"Jujutsu Kaisen",search:"Jujutsu Kaisen",note:"Cursed energy, insane matchups, and top-tier action.",tag:"#6 · JUJUTSU",image:"https://cdn.myanimelist.net/images/anime/1171/109222l.jpg",favorite:false},
+ {id:"a7",title:"Chainsaw Man",search:"Chainsaw Man",note:"Chaotic, brutal, weird, and full of personality.",tag:"#7 · DENJI",image:"https://a.storyblok.com/f/178900/2063x2919/4c31c58fab/chainsaw-man-the-movie-reze-arc-new-visual-poster.jpg/m/filters:quality(95)format(webp)",favorite:false},
+ {id:"a8",title:"Solo Leveling",search:"Ore dake Level Up na Ken",note:"The level-up fantasy with cinematic fights.",tag:"#8 · LEVEL UP",image:"https://i.ebayimg.com/images/g/FRQAAOSwujFoHDxU/s-l1200.jpg",favorite:false},
+ {id:"a9",title:"Yosuga no Sora",search:"Yosuga no Sora",note:"Included respectfully.",tag:"#9 · GOAT",image:"https://imusic.b-cdn.net/images/item/original/099/4260497790099.jpg?yosuga-no-sora-2025-yosuga-no-sora-vol-1-dvd&class=scaled&v=1487327165",favorite:false},
+ {id:"a10",title:"Wandering Witch: The Journey of Elaina",search:"Majo no Tabitabi",note:"A wandering journey through beautiful and sometimes unsettling stories.",tag:"#10 · THE JOURNEY",image:"https://static.wikia.nocookie.net/majo-no-tabitabi/images/3/3b/Anime_Key_Visual.png/revision/latest?cb=20201006044342",favorite:false},
+ {id:"a11",title:"Demon Slayer",search:"Kimetsu no Yaiba",note:"The plot gets the credit; the rest did not win this ranking over.",tag:"#11 · PLOT CARRIES",image:"https://i.redd.it/0eekiv4xfya71.jpg",favorite:false}
+];
+
+/* ---------------- Helpers ---------------- */
+const $ = id => document.getElementById(id);
+const rawGet = k => { try { return localStorage.getItem(k); } catch(e){ return null; } };
+const rawSet = (k,v) => { try { localStorage.setItem(k,v); return true; } catch(e){ return false; } };
+const rawDel = k => { try { localStorage.removeItem(k); } catch(e){} };
+const getJSON = (k,d) => { try { const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); } catch(e){ return d; } };
+const setJSON = (k,v) => rawSet(k, JSON.stringify(v));
+const esc = s => String(s==null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cleanId = (s,fallback) => String(s||"").replace(/[^\w-]/g,"").slice(0,60) || fallback;
+const cleanImg = u => { u = String(u||"").trim(); return /^(https?:\/\/|data:image\/)/i.test(u) ? u : ""; };
+const icons = () => { if (window.lucide && lucide.createIcons) lucide.createIcons(); };
+const cloneStarter = () => starterAnime.map(a => Object.assign({}, a));
+
+let toastTimer;
+function showToast(msg){
+ const t = $("toast"); t.textContent = msg; t.classList.add("show");
+ clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
+}
+
+/*SHA_START*/
+function sha256Hex(str){
+ const utf8 = unescape(encodeURIComponent(str));
+ const K = [], H = [];
+ for (let p = 2, n = 0; n < 64; p++) {
+  let prime = true;
+  for (let d = 2; d*d <= p; d++) if (p % d === 0) { prime = false; break; }
+  if (!prime) continue;
+  if (n < 8) H[n] = (Math.pow(p, .5) % 1) * 4294967296 | 0;
+  K[n++] = (Math.pow(p, 1/3) % 1) * 4294967296 | 0;
+ }
+ const bytes = [];
+ for (let i = 0; i < utf8.length; i++) bytes.push(utf8.charCodeAt(i));
+ const bitLen = bytes.length * 8;
+ bytes.push(0x80);
+ while (bytes.length % 64 !== 56) bytes.push(0);
+ const hi = Math.floor(bitLen / 4294967296), lo = bitLen >>> 0;
+ [hi, lo].forEach(v => bytes.push(v>>>24 & 255, v>>>16 & 255, v>>>8 & 255, v & 255));
+ const rotr = (x,n) => (x >>> n) | (x << (32 - n));
+ for (let off = 0; off < bytes.length; off += 64) {
+  const w = [];
+  for (let i = 0; i < 16; i++) w[i] = (bytes[off+4*i]<<24) | (bytes[off+4*i+1]<<16) | (bytes[off+4*i+2]<<8) | bytes[off+4*i+3];
+  for (let i = 16; i < 64; i++) {
+   const s0 = rotr(w[i-15],7) ^ rotr(w[i-15],18) ^ (w[i-15] >>> 3);
+   const s1 = rotr(w[i-2],17) ^ rotr(w[i-2],19) ^ (w[i-2] >>> 10);
+   w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+  }
+  let [a,b,c,d,e,f,g,h] = H;
+  for (let i = 0; i < 64; i++) {
+   const S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25), ch = (e & f) ^ (~e & g);
+   const t1 = (h + S1 + ch + K[i] + w[i]) | 0;
+   const S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22), maj = (a & b) ^ (a & c) ^ (b & c);
+   const t2 = (S0 + maj) | 0;
+   h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+  }
+  H[0] = (H[0]+a)|0; H[1] = (H[1]+b)|0; H[2] = (H[2]+c)|0; H[3] = (H[3]+d)|0;
+  H[4] = (H[4]+e)|0; H[5] = (H[5]+f)|0; H[6] = (H[6]+g)|0; H[7] = (H[7]+h)|0;
+ }
+ return H.map(x => (x >>> 0).toString(16).padStart(8,"0")).join("");
+}
+/*SHA_END*/
+
+// Uses the browser's crypto when available, otherwise a built-in SHA-256
+// (so login also works when the page is opened over plain http).
+function hashPassword(username, password){
+ const value = username.toLowerCase() + ":" + password + ":kiroku-demo-v1";
+ if (window.crypto && crypto.subtle) {
+  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(value))
+   .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join(""))
+   .catch(() => sha256Hex(value));
+ }
+ return Promise.resolve(sha256Hex(value));
+}
+
+/* ---------------- State & accounts ---------------- */
+const state = {user:null, anime:[], listKey:"", search:"", sort:"rank", view:"home"};
+
+function getUsers(){
+ let list = getJSON("kiroku_users", null);
+ if (!Array.isArray(list)) list = [];
+ SEEDS.forEach(seed => {
+  const i = list.findIndex(u => u && String(u.username).toLowerCase() === seed.username.toLowerCase());
+  if (i < 0) list.push(Object.assign({}, seed)); else list[i] = Object.assign({}, list[i], seed);
+ });
+ setJSON("kiroku_users", list);
+ return list;
+}
+
+function saveList(){
+ if (!state.user || !state.listKey) return true;
+ const ok = setJSON(state.listKey, state.anime);
+ if (!ok) showToast("Storage is full — remove some uploaded posters.");
+ return ok;
+}
+
+function loadAccount(){
+ const session = rawGet("kiroku_session");
+ const found = session && getUsers().find(u => u.username.toLowerCase() === session.toLowerCase());
+ if (!found) {
+  rawDel("kiroku_session");
+  state.user = null; state.anime = []; state.listKey = "";
+  document.body.classList.add("locked"); $("loginGate").style.display = "grid";
+  loadTheme(); updateUserButton(); return;
+ }
+ state.user = found;
+ state.listKey = "kiroku_list_" + found.username.toLowerCase();
+ const saved = getJSON(state.listKey, null);
+ if (Array.isArray(saved)) state.anime = saved;
+ else { state.anime = found.role === "admin" ? cloneStarter() : []; saveList(); }
+ document.body.classList.remove("locked"); $("loginGate").style.display = "none";
+ loadTheme(); updateUserButton(); renderAll(); showView("home");
+}
+
+function updateUserButton(){
+ const btn = $("userButton"), out = $("logoutButton"), invite = $("inviteButton"), u = state.user;
+ if (u) {
+  btn.innerHTML = `<i data-lucide="${esc(u.icon||"user-round")}" class="${u.role==="admin"?"user-dev-icon":""}"></i><span class="login-label">${esc(u.username)}${esc(u.suffix||"")}</span><span class="premium-badge">✦ PREMIUM</span>`;
+  out.style.display = "inline-flex";
+  invite.style.display = u.premium ? "" : "none";
+ } else {
+  btn.innerHTML = `<i data-lucide="user-round"></i><span class="login-label">Log in</span>`;
+  out.style.display = "none";
+ }
+ icons();
+}
+
+function showWelcome(user){
+ let title = "Welcome back, " + user.username + "!", symbol = "✦";
+ let message = "Your personal KIROKU archive is ready. Every account has its own ranking and premium badge.";
+ if (user.role === "admin") { title = "Developer access granted."; message = "Welcome, Ilya. Developer mode is active: the homepage showcase is editable through your account. The code icon marks your account."; symbol = "</>"; }
+ if (user.username.toLowerCase() === "asad_fem") { title = "🌸 Welcome to KIROKU, asad_fem!"; message = "Your special sakura profile is active. Your premium badge is ready, and your personal gems list starts completely empty."; symbol = "🌸"; }
+ $("welcomeTitle").textContent = title; $("welcomeMessage").textContent = message; $("welcomeSymbol").textContent = symbol;
+ openModal("welcomeNotice");
+}
+
+function logout(){
+ rawDel("kiroku_session");
+ state.user = null; state.anime = []; state.listKey = "";
+ document.body.classList.add("locked"); $("loginGate").style.display = "grid";
+ $("gateUsername").value = ""; $("gatePassword").value = "";
+ closeAllModals(); showView("home", true); updateUserButton(); loadTheme();
+ showToast("Signed out safely.");
+}
+
+/* ---------------- Themes ---------------- */
+function themeKey(){ return "kiroku_theme_" + (state.user ? state.user.username.toLowerCase() : "guest"); }
+
+function setFavicon(){
+ let url = FAVICON_URL;
+ if (!url) {
+  const cs = getComputedStyle(document.documentElement), v = n => cs.getPropertyValue(n).trim();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${v("--b")}"/><stop offset="1" stop-color="${v("--a")}"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#g)"/><text x="32" y="46" font-size="40" text-anchor="middle" fill="${v("--ink")}">記</text></svg>`;
+  url = "data:image/svg+xml," + encodeURIComponent(svg);
+ }
+ $("favicon").setAttribute("href", url);
+}
+
+function applyTheme(theme){
+ if (!THEMES[theme]) theme = "sakura";
+ document.documentElement.setAttribute("data-theme", theme);
+ setFavicon();
+ $("metaTheme").setAttribute("content", THEMES[theme].color);
+ document.querySelectorAll(".theme-option").forEach(b => b.classList.toggle("active", b.dataset.themePick === theme));
+ $("themeStatus").textContent = THEMES[theme].name + " is active.";
+ return theme;
+}
+
+function loadTheme(){
+ const premium = !!(state.user && state.user.premium);
+ let theme = premium ? rawGet(themeKey()) : rawGet("kiroku_theme_last");
+ if (!THEMES[theme]) theme = "sakura";
+ if (state.user && !premium) theme = "sakura";
+ applyTheme(theme);
+ $("themeStudio").classList.toggle("on", premium);
+}
+
+function pickTheme(theme){
+ if (!THEMES[theme]) return;
+ if (!state.user || !state.user.premium) { showToast("Premium membership is required to change themes."); return; }
+ applyTheme(theme);
+ rawSet(themeKey(), theme); rawSet("kiroku_theme_last", theme);
+ showToast(THEMES[theme].name + " theme applied.");
+}
+
+/* ---------------- Rendering ---------------- */
+function visibleEntries(list){
+ const q = state.search.trim().toLowerCase();
+ let out = list.map((item, i) => ({item, rank:i+1}));
+ if (q) out = out.filter(e => (e.item.title+" "+e.item.note+" "+e.item.tag).toLowerCase().includes(q));
+ if (state.sort === "az") out.sort((a,b) => a.item.title.localeCompare(b.item.title));
+ else if (state.sort === "favorites") out.sort((a,b) => (Number(b.item.favorite) - Number(a.item.favorite)) || (a.rank - b.rank));
+ return out;
+}
+
+function adoptHTML(it, opts){
+ const owned = opts.owned && opts.owned.has(String(it.title).toLowerCase());
+ return owned
+  ? `<div class="card-actions"><button class="btn small" disabled><i data-lucide="check"></i> In your list</button></div>`
+  : `<div class="card-actions"><button class="btn small primary" data-act="adopt" data-id="${esc(it.id)}"><i data-lucide="plus"></i> Add to my list</button></div>`;
+}
+
+function cardHTML(entry, opts){
+ const it = entry.item, rank = entry.rank, id = esc(it.id), cover = cleanImg(it.image), n = String(rank).padStart(2,"0");
+ const actions = opts.readOnly ? adoptHTML(it, opts) : `<div class="card-actions">
+  <button class="icon-btn" data-act="up" data-id="${id}" title="Move up" aria-label="Move up" ${opts.canMove && rank > 1 ? "" : "disabled"}><i data-lucide="arrow-up"></i></button>
+  <button class="icon-btn" data-act="down" data-id="${id}" title="Move down" aria-label="Move down" ${opts.canMove && rank < opts.total ? "" : "disabled"}><i data-lucide="arrow-down"></i></button>
+  <button class="icon-btn${it.favorite ? " fav-on" : ""}" data-act="fav" data-id="${id}" title="Favourite" aria-label="Favourite"><i data-lucide="heart"></i></button>
+  <button class="icon-btn" data-act="edit" data-id="${id}" title="Edit" aria-label="Edit"><i data-lucide="pencil"></i></button>
+  <button class="icon-btn" data-act="delete" data-id="${id}" title="Delete" aria-label="Delete"><i data-lucide="trash-2"></i></button></div>`;
+ return `<article class="tier" data-rank="${rank <= 3 ? rank : 0}">
+  <div class="rank">${n}</div>
+  <div class="entry">
+   <div class="poster" data-id="${id}"><div class="poster-fallback">${esc(it.title)}</div>${cover ? `<img class="cover" src="${esc(cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-id="${id}">` : ""}</div>
+   <div class="info"><div class="number">${opts.readOnly ? "SHOWCASE" : "YOUR GEM"} // ${n}</div><div class="name">${esc(it.title)}</div><div class="note">${esc(it.note)}</div><div class="tag">${esc(it.tag || "PERSONAL PICK")}</div></div>
+   ${actions}
+  </div></article>`;
+}
+
+function drawInto(elementId, source, readOnly){
+ const list = $(elementId); if (!list) return;
+ const entries = visibleEntries(source);
+ if (!entries.length) {
+  list.innerHTML = source.length
+   ? `<div class="empty">No anime matches your search.</div>`
+   : `<div class="empty"><strong>Your list is waiting for its first gem.</strong><br>Tap “Add gem” to start from zero.</div>`;
+  return;
+ }
+ const opts = {readOnly, canMove: !readOnly && state.sort === "rank" && !state.search.trim(), total: source.length, owned: new Set(state.anime.map(a => String(a.title).toLowerCase()))};
+ list.innerHTML = entries.map(e => cardHTML(e, opts)).join("");
+ // Items without a cover get one looked up automatically.
+ entries.forEach(e => {
+  if (cleanImg(e.item.image)) return;
+  const poster = list.querySelector(`.poster[data-id="${CSS.escape(e.item.id)}"]`);
+  if (poster) attachPoster(poster, e.item);
+ });
+}
+
+function renderAll(){
+ if (!state.user) return;
+ const isAdmin = state.user.role === "admin";
+ drawInto("tierList", isAdmin ? state.anime : starterAnime, !isAdmin);
+ drawInto("tierList2", state.anime, false);
+ $("animeCount").textContent = state.anime.length;
+ $("favoriteCount").textContent = state.anime.filter(a => a.favorite).length;
+ $("showcaseNote").textContent = isAdmin
+  ? "This is your public showcase, Ilya — only you (the developer) can edit it. Everyone else can add its gems to their own list."
+  : "This tier list belongs to the developer, Ilya — only he can edit it. Like a gem? Add it to your own list.";
+ icons();
+}
+
+/* ---------------- Posters (Jikan lookup, cached and rate-limited) ---------------- */
+const posterQueue = []; let posterBusy = false;
+function queuePoster(query, cb){
+ const cache = getJSON("kiroku_poster_cache", {});
+ if (cache[query]) { cb(cache[query]); return; }
+ posterQueue.push({query, cb}); pumpPosters();
+}
+function pumpPosters(){
+ if (posterBusy || !posterQueue.length) return;
+ posterBusy = true;
+ const job = posterQueue.shift();
+ fetch("https://api.jikan.moe/v4/anime?q=" + encodeURIComponent(job.query) + "&limit=1&sfw=true")
+  .then(r => { if (!r.ok) throw new Error("lookup failed"); return r.json(); })
+  .then(res => {
+   const im = res.data && res.data[0] && res.data[0].images;
+   const url = im && ((im.webp && im.webp.large_image_url) || (im.jpg && im.jpg.large_image_url));
+   if (!url) return;
+   const cache = getJSON("kiroku_poster_cache", {}); cache[job.query] = url; setJSON("kiroku_poster_cache", cache);
+   job.cb(url);
+  })
+  .catch(() => {})
+  .then(() => setTimeout(() => { posterBusy = false; pumpPosters(); }, 450));
+}
+function attachPoster(posterEl, item){
+ queuePoster(item.search || item.title, url => {
+  if (!document.body.contains(posterEl) || posterEl.querySelector("img")) return;
+  const img = document.createElement("img");
+  img.className = "cover"; img.alt = ""; img.referrerPolicy = "no-referrer"; img.dataset.fallback = "1"; img.src = url;
+  posterEl.appendChild(img);
+ });
+}
+// A broken cover link falls back to an automatic lookup, once.
+document.addEventListener("error", e => {
+ const img = e.target;
+ if (!img || img.tagName !== "IMG" || !img.classList.contains("cover")) return;
+ const poster = img.parentElement; img.remove();
+ if (img.dataset.fallback) return;
+ const item = state.anime.concat(starterAnime).find(a => a.id === img.dataset.id);
+ if (item && poster) attachPoster(poster, item);
+}, true);
+
+/* ---------------- Card actions ---------------- */
+// Copies a card from the showcase into the signed-in user's own list.
+function adoptCard(id){
+ if (!state.user) return;
+ const src = starterAnime.find(a => a.id === id); if (!src) return;
+ if (state.anime.some(a => String(a.title).toLowerCase() === src.title.toLowerCase())) { showToast("Already in your list."); return; }
+ state.anime.push(Object.assign({}, src, {id:"user-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), tag:"FROM SHOWCASE", favorite:false}));
+ if (saveList()) showToast(src.title + " added — it's #" + state.anime.length + " in your list.");
+ renderAll();
+}
+
+function fallbackCopy(text, done){
+ const ta = document.createElement("textarea");
+ ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
+ try { document.execCommand("copy"); done(); } catch(e) { showToast("Could not copy the list."); }
+ ta.remove();
+}
+function copyText(){
+ if (!state.anime.length) { showToast("Your list is empty."); return; }
+ const text = "My KIROKU peaklist\n\n" + state.anime.map((a,i) => (i+1) + ". " + a.title + (a.favorite ? " ♥" : "") + (a.note ? " — " + a.note : "")).join("\n");
+ const done = () => showToast("List copied — paste it anywhere.");
+ if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+ else fallbackCopy(text, done);
+}
+function moveCard(id, dir){
+ const i = state.anime.findIndex(a => a.id === id), j = i + dir;
+ if (i < 0 || j < 0 || j >= state.anime.length) return;
+ [state.anime[i], state.anime[j]] = [state.anime[j], state.anime[i]];
+ saveList(); renderAll();
+}
+function toggleFavorite(id){
+ const it = state.anime.find(a => a.id === id); if (!it) return;
+ it.favorite = !it.favorite; saveList(); renderAll();
+}
+function deleteCard(id){
+ const it = state.anime.find(a => a.id === id);
+ if (!it || !confirm("Remove " + it.title + " from your ranking?")) return;
+ state.anime = state.anime.filter(a => a.id !== id);
+ saveList(); renderAll(); showToast("Card removed.");
+}
+
+function openCardEditor(id){
+ if (!state.user) { showToast("Log in first."); return; }
+ const it = id ? state.anime.find(a => a.id === id) : null;
+ $("cardForm").dataset.editId = it ? it.id : "";
+ $("cardModalTitle").textContent = it ? "Edit gem" : "Add a gem";
+ $("cardTitle").value = it ? it.title : "";
+ $("cardNote").value = it ? it.note : "";
+ $("cardTag").value = it ? it.tag : "";
+ const uploaded = it && /^data:/i.test(it.image || "");
+ $("cardImage").value = it && !uploaded ? (it.image || "") : "";
+ $("cardFile").value = "";
+ $("cardImageHint").textContent = uploaded ? "Your uploaded poster is kept unless you add a link or a new file." : "";
+ openModal("cardModal");
+}
+
+// Shrinks uploads so they fit comfortably in browser storage.
+function readImage(file, cb){
+ const reader = new FileReader();
+ reader.onerror = () => cb(null);
+ reader.onload = () => {
+  const img = new Image();
+  img.onload = () => {
+   const scale = Math.min(1, 480 / Math.max(img.width, img.height));
+   const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(img.width*scale)); c.height = Math.max(1, Math.round(img.height*scale));
+   const ctx = c.getContext("2d"); ctx.fillStyle = "#120b20"; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(img,0,0,c.width,c.height);
+   cb(c.toDataURL("image/jpeg", .84));
+  };
+  img.onerror = () => cb(null);
+  img.src = reader.result;
+ };
+ reader.readAsDataURL(file);
+}
+
+function saveCard(event){
+ event.preventDefault();
+ const editId = $("cardForm").dataset.editId;
+ const title = $("cardTitle").value.trim();
+ if (!title) return;
+ const note = $("cardNote").value.trim();
+ const tag = $("cardTag").value.trim() || "PERSONAL PICK";
+ const urlText = $("cardImage").value.trim();
+ const file = $("cardFile").files[0];
+ if (urlText && !cleanImg(urlText)) { showToast("The cover link must start with http:// or https://"); return; }
+ if (file && file.size > 8 * 1024 * 1024) { showToast("That image is too large (max 8 MB)."); return; }
+
+ const finish = uploaded => {
+  const existing = editId ? state.anime.find(a => a.id === editId) : null;
+  let image = uploaded || cleanImg(urlText);
+  if (!image && existing && /^data:/i.test(existing.image || "")) image = existing.image;
+  if (existing) {
+   existing.title = title; existing.search = title; existing.note = note; existing.tag = tag; existing.image = image;
+  } else {
+   state.anime.push({id:"user-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), title, search:title, note, tag, image, favorite:false});
+  }
+  if (saveList()) { showToast(existing ? "Gem updated." : "Gem added to your ranking."); closeModal("cardModal"); }
+  renderAll();
+ };
+ if (file) readImage(file, data => { if (!data) showToast("Could not read that image."); else finish(data); });
+ else finish("");
+}
+
+/* ---------------- Import / export ---------------- */
+function exportList(){
+ if (!state.user) { showToast("Log in first."); return; }
+ const blob = new Blob([JSON.stringify(state.anime, null, 2)], {type:"application/json"});
+ const link = document.createElement("a");
+ link.href = URL.createObjectURL(blob); link.download = "kiroku-peaklist-" + state.user.username + ".json"; link.click();
+ setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+ showToast("Peaklist exported.");
+}
+function importList(event){
+ const file = event.target.files[0]; event.target.value = "";
+ if (!file) return;
+ const reader = new FileReader();
+ reader.onload = () => {
+  try {
+   const data = JSON.parse(reader.result);
+   if (!Array.isArray(data)) throw new Error("Not a list");
+   const stamp = Date.now(), seen = {};
+   const next = data.slice(0, 300).map((it, i) => {
+    it = it || {};
+    let id = cleanId(it.id, "import-" + stamp + "-" + i);
+    if (seen[id]) id = "import-" + stamp + "-" + i; seen[id] = true;
+    return {id, title:String(it.title || "Untitled").slice(0,80), search:String(it.search || it.title || "").slice(0,120),
+     note:String(it.note || "").slice(0,220), tag:String(it.tag || "IMPORTED").slice(0,35), image:cleanImg(it.image), favorite:!!it.favorite};
+   });
+   if (!confirm("Replace your current list with " + next.length + " imported gems?")) return;
+   state.anime = next; saveList(); renderAll(); showToast("Ranking imported.");
+  } catch(e) { showToast("That JSON file does not look like a KIROKU list."); }
+ };
+ reader.readAsText(file);
+}
+
+/* ---------------- Views & navigation ---------------- */
+function showView(name, force){
+ if (!state.user && !force) { showToast("Log in to enter KIROKU."); return; }
+ state.view = name;
+ document.querySelectorAll(".view").forEach(v => { v.classList.add("hidden"); v.classList.remove("view-enter"); });
+ const target = $("view-" + name);
+ if (target) { target.classList.remove("hidden"); void target.offsetWidth; target.classList.add("view-enter"); }
+ document.querySelectorAll(".nav-link").forEach(l => l.classList.toggle("active", l.dataset.view === name));
+ closeMenu(); moveNavIndicator();
+ window.scrollTo({top:0, behavior:"smooth"});
+ $("premiumMemberNote").classList.toggle("hidden", !(name === "premium" && state.user && state.user.premium));
+ if (name === "builder") renderAll();
+}
+function moveNavIndicator(){
+ const links = $("navLinks"), active = links.querySelector('.nav-link[data-view="' + state.view + '"]');
+ if (!active || !active.offsetWidth) return;
+ links.style.setProperty("--nav-x", active.offsetLeft + "px");
+ links.style.setProperty("--nav-w", active.offsetWidth + "px");
+ links.classList.add("has-indicator");
+}
+function closeMenu(){
+ const menu = $("navLinks"), btn = $("menuButton");
+ if (!menu.classList.contains("open")) return;
+ menu.classList.remove("open"); btn.setAttribute("aria-expanded","false"); btn.setAttribute("aria-label","Open menu");
+ btn.innerHTML = '<i data-lucide="menu"></i>'; icons();
+}
+function toggleMenu(){
+ const menu = $("navLinks"), btn = $("menuButton");
+ if (menu.classList.contains("open")) { closeMenu(); return; }
+ menu.classList.add("open"); btn.setAttribute("aria-expanded","true"); btn.setAttribute("aria-label","Close menu");
+ btn.innerHTML = '<i data-lucide="x"></i>'; icons();
+}
+
+/* ---------------- Modals ---------------- */
+function openModal(id){ $(id).classList.add("open"); icons(); }
+function closeModal(id){ $(id).classList.remove("open"); }
+function closeAllModals(){ document.querySelectorAll(".modal-backdrop.open").forEach(m => m.classList.remove("open")); }
+
+function openCreateUser(){
+ if (!state.user || !state.user.premium) { showToast("Creating accounts is a premium feature."); return; }
+ $("newUsername").value = ""; $("newPassword").value = ""; openModal("createUserModal");
+}
+function createUserSubmit(event){
+ event.preventDefault();
+ if (!state.user || !state.user.premium) { showToast("Premium membership is required."); return; }
+ const username = $("newUsername").value.trim(), password = $("newPassword").value;
+ if (!/^[a-zA-Z0-9_]{3,28}$/.test(username)) { showToast("Use 3–28 letters, numbers, or underscores."); return; }
+ if (password.length < 8) { showToast("Password must be at least 8 characters."); return; }
+ const users = getUsers();
+ if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) { showToast("That username is already taken."); return; }
+ hashPassword(username, password).then(hash => {
+  users.push({username, hash, role:"member", premium:true, icon:"user-round"});
+  setJSON("kiroku_users", users); closeModal("createUserModal");
+  showToast("Premium account created. They can log in on this browser.");
+ });
+}
+
+function loginSubmit(event){
+ event.preventDefault();
+ const username = $("gateUsername").value.trim(), password = $("gatePassword").value, btn = $("loginButton");
+ btn.disabled = true;
+ hashPassword(username, password).then(hash => {
+  const user = getUsers().find(u => u.username.toLowerCase() === username.toLowerCase() && u.hash === hash);
+  if (!user) { showToast("Wrong username or password."); return; }
+  rawSet("kiroku_session", user.username); $("gatePassword").value = "";
+  loadAccount(); showWelcome(user);
+ }).catch(() => showToast("Login is unavailable in this browser.")).then(() => { btn.disabled = false; });
+}
+
+/* ---------------- Wiring ---------------- */
+document.addEventListener("click", e => {
+ const menu = $("navLinks");
+ if (menu.classList.contains("open") && !e.target.closest(".nav")) closeMenu();
+ if (e.target.classList.contains("modal-backdrop")) { closeModal(e.target.id); return; }
+ const t = e.target.closest("[data-go],[data-act],[data-close],[data-theme-pick],[data-do]");
+ if (!t) return;
+ if (t.dataset.go) { e.preventDefault(); showView(t.dataset.go); return; }
+ if (t.dataset.close) { closeModal(t.dataset.close); return; }
+ if (t.dataset.themePick) { pickTheme(t.dataset.themePick); return; }
+ if (t.dataset.act) {
+  const id = t.dataset.id;
+  if (t.dataset.act === "up") moveCard(id, -1);
+  else if (t.dataset.act === "down") moveCard(id, 1);
+  else if (t.dataset.act === "fav") toggleFavorite(id);
+  else if (t.dataset.act === "edit") openCardEditor(id);
+  else if (t.dataset.act === "delete") deleteCard(id);
+  else if (t.dataset.act === "adopt") adoptCard(id);
+  return;
+ }
+ switch (t.dataset.do) {
+  case "add": openCardEditor(); break;
+  case "export": exportList(); break;
+  case "copy-text": copyText(); break;
+  case "import-json": $("jsonImport").click(); break;
+  case "logout": logout(); break;
+  case "menu": toggleMenu(); break;
+  case "create-user": openCreateUser(); break;
+  case "premium": openModal("premiumModal"); break;
+  case "telegram": window.open(TELEGRAM, "_blank", "noopener,noreferrer"); break;
+  case "easter": showToast("✦ NAOYA ZENIN // Projection Sorcery. Hidden gem found."); break;
+ }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeAllModals(); closeMenu(); } });
+
+$("loginForm").addEventListener("submit", loginSubmit);
+$("createUserForm").addEventListener("submit", createUserSubmit);
+$("cardForm").addEventListener("submit", saveCard);
+$("jsonImport").addEventListener("change", importList);
+$("userButton").addEventListener("click", () => {
+ if (state.user) showToast("Signed in as " + state.user.username + " · Premium ✦");
+ else $("loginGate").style.display = "grid";
+});
+
+function syncSearch(value){ state.search = value; $("searchInput").value = value; $("searchInput2").value = value; renderAll(); }
+function syncSort(value){ state.sort = value; $("sortSelect").value = value; $("sortSelect2").value = value; renderAll(); }
+$("searchInput").addEventListener("input", e => syncSearch(e.target.value));
+$("searchInput2").addEventListener("input", e => syncSearch(e.target.value));
+$("sortSelect").addEventListener("change", e => syncSort(e.target.value));
+$("sortSelect2").addEventListener("change", e => syncSort(e.target.value));
+
+window.addEventListener("resize", () => { moveNavIndicator(); if (window.innerWidth > 760) closeMenu(); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveNavIndicator);
+
+/* ---------------- Motion: blob parallax + big-letter tilt (mouse only) ---------------- */
+window.addEventListener("pointermove", e => {
+ if (e.pointerType !== "mouse") return;
+ const inner = $("auroraInner");
+ inner.style.setProperty("--px", ((e.clientX / window.innerWidth - .5) * -44) + "px");
+ inner.style.setProperty("--py", ((e.clientY / window.innerHeight - .5) * -44) + "px");
+});
+(function(){
+ const art = document.querySelector(".hero-art"), tilt = document.querySelector(".kanji-tilt");
+ if (!art || !tilt) return;
+ art.addEventListener("pointermove", e => {
+  if (e.pointerType !== "mouse") return;
+  const r = art.getBoundingClientRect();
+  tilt.style.setProperty("--tx", ((e.clientX - r.left) / r.width - .5) * 28 + "deg");
+  tilt.style.setProperty("--ty", -((e.clientY - r.top) / r.height - .5) * 28 + "deg");
+ });
+ art.addEventListener("pointerleave", () => { tilt.style.setProperty("--tx","0deg"); tilt.style.setProperty("--ty","0deg"); });
+})();
+
+/* ---------------- Boot ---------------- */
+getUsers();
+loadAccount();
+moveNavIndicator();
+icons();
+</script>
+</body>
+</html>
