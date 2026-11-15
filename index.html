@@ -228,6 +228,7 @@ h1{font:700 clamp(48px,7vw,86px)/.98 "Space Grotesk";letter-spacing:-.075em;marg
 
 /* ---------- Footer, modals, gate, toast ---------- */
 footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+body.rankings-view footer{border-top:0}
 .footer-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .easter-egg{border:1px solid var(--line);background:rgba(var(--a-rgb),.12);color:var(--b);border-radius:50%;width:21px;height:21px;margin-left:6px;font-size:11px}
 .modal-backdrop{position:fixed;inset:0;background:rgba(3,3,7,.8);z-index:100;display:none;place-items:center;padding:18px}
@@ -310,7 +311,12 @@ html[data-lite="1"] .premium-member-note{animation:none}
  .tab{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;color:var(--muted);font:700 10px "DM Sans";letter-spacing:.03em;border-radius:14px;min-width:0}
  .tab svg{width:22px;height:22px}
  .tab.active{color:var(--b)}
- .tab.active:before{content:"";position:absolute;top:0;width:28px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--b),var(--a))}
+ .tabbar:before{content:"";position:absolute;z-index:0;top:0;left:8px;width:28px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--b),var(--a));transform:translateX(var(--tab-indicator-x, 0px));transition:transform .32s cubic-bezier(.2,.8,.2,1);pointer-events:none}
+ .tab{z-index:1;transition:color .22s ease,transform .22s ease}
+ .tab svg{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+ .tab.active svg{transform:translateY(-2px) scale(1.06)}
+ .tab span{transition:opacity .22s ease,transform .22s ease}
+ .tab.active span{transform:translateY(-1px)}
  .fab{display:grid;place-items:center;position:fixed;right:16px;bottom:calc(var(--tabbar) + var(--safe) + 14px);z-index:44;width:54px;height:54px;border-radius:18px;border:0;background:linear-gradient(135deg,var(--b),var(--a));color:var(--ink);box-shadow:0 10px 24px rgba(0,0,0,.5)}
  .fab svg{width:24px;height:24px}
  .fab:active,.tab:active{transform:scale(.94)}
@@ -848,7 +854,7 @@ function cardHTML(entry, opts){
   <button class="icon-btn${it.favorite ? " fav-on" : ""}" data-act="fav" data-id="${id}" title="Favourite" aria-label="Favourite"><i data-lucide="heart"></i></button>
   <button class="icon-btn" data-act="edit" data-id="${id}" title="Edit" aria-label="Edit"><i data-lucide="pencil"></i></button>
   <button class="icon-btn" data-act="delete" data-id="${id}" title="Delete" aria-label="Delete"><i data-lucide="trash-2"></i></button></div>`;
- return `<article class="tier" data-rank="${rank <= 3 ? rank : 0}">
+ return `<article class="tier" data-id="${id}" data-rank="${rank <= 3 ? rank : 0}">
   <div class="rank">${n}</div>
   <div class="entry">
    <div class="poster" data-id="${id}"><div class="poster-fallback">${esc(it.title)}</div>${cover ? `<img class="cover" src="${esc(cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-id="${id}">` : ""}</div>
@@ -957,8 +963,27 @@ function copyText(){
 function moveCard(id, dir){
  const i = state.anime.findIndex(a => a.id === id), j = i + dir;
  if (i < 0 || j < 0 || j >= state.anime.length) return;
+ // FLIP: remember each visible card's position before the DOM is re-rendered.
+ const before = new Map();
+ document.querySelectorAll(".tier-list .tier[data-id]").forEach(card => {
+  const key = (card.closest(".tier-list").id || "") + "::" + card.dataset.id;
+  before.set(key, card.getBoundingClientRect());
+ });
  [state.anime[i], state.anime[j]] = [state.anime[j], state.anime[i]];
  saveList(); renderAll();
+ if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+ document.querySelectorAll(".tier-list .tier[data-id]").forEach(card => {
+  const key = (card.closest(".tier-list").id || "") + "::" + card.dataset.id;
+  const from = before.get(key);
+  if (!from) return;
+  const to = card.getBoundingClientRect();
+  const dx = from.left - to.left, dy = from.top - to.top;
+  if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+  card.animate([
+   { transform: `translate(${dx}px, ${dy}px)` },
+   { transform: "translate(0, 0)" }
+  ], { duration: 360, easing: "cubic-bezier(.2,.8,.2,1)" });
+ });
 }
 function toggleFavorite(id){
  const it = state.anime.find(a => a.id === id); if (!it) return;
@@ -1079,9 +1104,11 @@ function showView(name, force){
  const target = $("view-" + name);
  if (target) { target.classList.remove("hidden"); void target.offsetWidth; target.classList.add("view-enter"); }
  document.querySelectorAll(".nav-link,.tab").forEach(l => l.classList.toggle("active", l.dataset.view === name));
+ document.body.classList.toggle("rankings-view", name === "builder");
  $("fab").classList.toggle("hidden", !(name === "home" || name === "builder"));
- moveNavIndicator();
+ moveNavIndicator(); moveTabIndicator();
  window.scrollTo({top:0, behavior: isLite() ? "instant" : "smooth"});
+ moveTabIndicator();
  $("premiumMemberNote").classList.toggle("hidden", !(name === "premium" && state.user && state.user.premium));
  if (name === "home" || name === "builder") renderAll();
 }
@@ -1091,6 +1118,12 @@ function moveNavIndicator(){
  links.style.setProperty("--nav-x", active.offsetLeft + "px");
  links.style.setProperty("--nav-w", active.offsetWidth + "px");
  links.classList.add("has-indicator");
+}
+function moveTabIndicator(){
+ const bar = $("tabbar"), active = bar && bar.querySelector('.tab[data-view="' + state.view + '"]');
+ if (!bar || !active || !active.offsetWidth) return;
+ const x = active.offsetLeft + active.offsetWidth / 2 - 14 - 8;
+ bar.style.setProperty("--tab-indicator-x", Math.max(0, x) + "px");
 }
 
 /* ---------------- Naoya figure: PNG layers tinted on <canvas> with the theme colours ----------------
@@ -1215,7 +1248,7 @@ $("searchInput2").addEventListener("input", e => syncSearch(e.target.value));
 $("sortSelect").addEventListener("change", e => syncSort(e.target.value));
 $("sortSelect2").addEventListener("change", e => syncSort(e.target.value));
 
-window.addEventListener("resize", moveNavIndicator);
+window.addEventListener("resize", () => { moveNavIndicator(); moveTabIndicator(); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(moveNavIndicator);
 
 /* ---------------- Motion: blob parallax + big-letter tilt (mouse only) ---------------- */
