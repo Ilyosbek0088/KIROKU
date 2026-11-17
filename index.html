@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1017" id="metaTheme">
 <title>KIROKU by Ilya | ANILIST</title>
 <link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23aeb9d0'/%3E%3Ctext x='32' y='46' font-size='40' text-anchor='middle' fill='%23090d17'%3E記%3C/text%3E%3C/svg%3E">
@@ -24,6 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/lucide@latest" defer></script>
 <style>
 /* ============================================================
@@ -292,9 +293,54 @@ html[data-lite="1"] .premium-member-note{animation:none}
  .nav-actions .btn.ghost,.nav-actions .logout-button,.nav-actions .invite-button{width:40px;padding:0;height:40px}
  .nav-link{padding:9px 11px;font-size:12px}
 }
+/* ---------- Fix pack: chips, friend toolbar, selects ---------- */
+.chip-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:10px}
+.chip-row .tag,.chip-row .watch-status{margin-top:0}
+select.field,.select{appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;text-overflow:ellipsis;padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aab3c8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.friend-toolbar{display:flex!important;flex-wrap:wrap;align-items:center;gap:12px;margin:18px 0 17px}
+.friend-toolbar>.select{height:48px;flex:1 1 220px;width:auto;min-width:0;max-width:340px}
+.friend-toolbar>#friendStatusFilter{flex:0 1 190px}
+.friend-toolbar .kx-fav-filter{margin-left:auto;height:48px;padding:0 16px;gap:10px;border:1px solid var(--line);border-radius:11px;background:rgba(var(--field),.75);color:var(--text);font-weight:600;cursor:pointer;user-select:none;transition:.2s}
+.friend-toolbar .kx-fav-filter:hover{border-color:rgba(var(--b-rgb),.5)}
+.kx-fav-filter input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+.kx-fav-box{width:18px;height:18px;flex:none;border-radius:6px;border:1.5px solid rgba(var(--b-rgb),.55);display:grid;place-items:center;transition:.2s}
+.kx-fav-filter input:checked+.kx-fav-box{background:linear-gradient(135deg,var(--b),var(--a));border-color:transparent}
+.kx-fav-filter input:checked+.kx-fav-box:after{content:"";width:5px;height:9px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.kx-fav-filter input:focus-visible+.kx-fav-box{box-shadow:0 0 0 3px rgba(var(--a-rgb),.35)}
+.kx-fav-filter:has(input:checked){border-color:rgba(var(--b-rgb),.6)!important;background:rgba(var(--a-rgb),.16)!important}
+@media(max-width:640px){.friend-toolbar>.select,.friend-toolbar>#friendStatusFilter{flex:1 1 100%;max-width:none}.friend-toolbar .kx-fav-filter{margin-left:0;flex:1 1 100%}}
+.upload-warn{display:block;margin-top:6px;color:var(--muted);font-size:11px;line-height:1.5}
+
 @media(max-width:1000px){
  .toolbar{display:flex;flex-wrap:wrap}.toolbar .search{flex:1 1 100%}.toolbar>.select{flex:1 1 160px;width:auto}.toolbar>.btn{flex:0 0 auto}
  .entry{grid-template-columns:82px minmax(0,1fr) auto}.poster{width:82px;height:104px}
+}
+/* Small laptops: keep controls breathable instead of squeezing them together. */
+@media(min-width:861px) and (max-width:1180px){
+ .nav{padding:0 18px;gap:12px}
+ .nav-links{gap:2px}
+ .nav-actions{gap:8px}
+ .nav-actions .btn.ghost,.nav-actions .logout-button,.nav-actions .invite-button{width:42px;height:42px}
+ .toolbar{gap:10px}
+ .toolbar>.select{min-width:180px}
+ .toolbar>.btn{min-width:110px;padding:10px 12px}
+ .hero{grid-template-columns:1fr .85fr;gap:26px}
+ .kx-tool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .kx-lab-grid{grid-template-columns:minmax(0,1.1fr) minmax(240px,.9fr)}
+ .gate-card{width:min(430px,100%);padding:24px 28px}
+ .gate-brand{margin-bottom:22px}
+ .gate-card h1{font-size:clamp(38px,5vw,52px);margin:10px 0}
+ .gate-copy{margin-bottom:18px}
+}
+/* Short laptop screens: the login gate should fit without scrolling. */
+@media(min-width:861px) and (max-height:820px){
+ .login-gate{padding:14px}
+ .gate-card{width:min(430px,100%);padding:22px 26px;border-radius:22px}
+ .gate-brand{font-size:20px;margin-bottom:18px}
+ .gate-card h1{font-size:clamp(36px,4vw,48px);margin:8px 0}
+ .gate-copy{font-size:12px;line-height:1.6;margin-bottom:16px}
+ .gate-help{margin-top:12px}
+ .gate-foot{margin-top:16px;padding-top:12px}
 }
 
 /* ---------- PHONE UI: top bar + bottom tab bar + floating add button + bottom-sheet modals ---------- */
@@ -407,6 +453,64 @@ html[data-lite="1"] .premium-member-note{animation:none}
  .tier:hover .poster img,.tier:hover .rank{transform:none;filter:none}
 }
 .btn:active,.icon-btn:active{transform:scale(.97)}
+
+/* ---------- KIROKU Lab: theme-aware additions from the Original ---------- */
+#createUserModal{z-index:200}
+.gate-register{display:flex;justify-content:center;gap:7px;align-items:center;margin:16px 0 0;color:var(--muted);font-size:12px}.text-link{border:0;background:transparent;color:var(--b);font-weight:800;text-decoration:underline;text-underline-offset:3px;padding:4px}
+.watch-status{display:inline-flex;align-items:center;gap:6px;margin-top:9px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:rgba(var(--a-rgb),.1);color:var(--b);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.watch-status:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.status-watching{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.3);color:#6ee7b7}.status-completed{color:var(--b)}.status-dropped{color:#fca5a5;border-color:rgba(248,113,113,.28)}
+.kx-panel{min-width:0;padding:22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(var(--a-rgb),.1),rgba(var(--field),.7));box-shadow:0 16px 48px rgba(0,0,0,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}.kx-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}.kx-panel-head h3{font:700 21px "Space Grotesk";margin:3px 0 5px;letter-spacing:-.04em}.kx-panel-head p{font-size:12px;color:var(--muted);margin:0;line-height:1.6}.kx-live-dot{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(52,211,153,.28);background:rgba(52,211,153,.1);color:#6ee7b7;border-radius:999px;padding:5px 9px;font-size:9px;font-weight:900;letter-spacing:.1em}.kx-live-dot:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor}.kx-group-watch{margin-top:24px}.kx-watch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.kx-watch-card{display:flex;align-items:center;gap:11px;min-width:0;padding:10px;border-radius:14px;border:1px solid var(--line);background:rgba(var(--field),.42)}.kx-watch-poster{width:42px;height:56px;flex:none;overflow:hidden;border-radius:8px;background:linear-gradient(135deg,rgba(var(--a-rgb),.25),rgba(var(--b-rgb),.1));display:grid;place-items:center;color:var(--b);font:700 20px "Space Grotesk"}.kx-watch-poster img{width:100%;height:100%;object-fit:cover}.kx-watch-copy{min-width:0;flex:1}.kx-watch-copy b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.kx-watch-copy small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.kx-watch-empty,.kx-empty{padding:22px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:14px}.kx-fav-filter{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px;white-space:nowrap}.kx-fav-filter input{accent-color:var(--b)}.kx-friend-meta{margin:-2px 0 14px}.kx-profile-strip{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:var(--surf)}.kx-profile-avatar{width:42px;height:42px;display:grid;place-items:center;flex:none;border-radius:13px;background:linear-gradient(135deg,var(--b),var(--a));color:var(--ink);font:800 18px "Space Grotesk"}.kx-profile-copy{min-width:0;flex:1}.kx-profile-copy b,.kx-profile-copy small{display:block}.kx-profile-copy b{font-size:14px}.kx-profile-copy small{font-size:10px;color:var(--muted);margin-top:3px}.kx-profile-stat{text-align:center;min-width:46px}.kx-profile-stat b{display:block;font:700 17px "Space Grotesk"}.kx-profile-stat small{font-size:9px;color:var(--muted)}
+.kx-section-title{margin-top:54px}.kx-tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}.kx-tool{display:flex;align-items:center;gap:12px;min-width:0;padding:16px;border:1px solid var(--line);border-radius:16px;background:var(--surf);color:var(--text);text-align:left;transition:transform .2s,border-color .2s,box-shadow .2s}.kx-tool:hover{transform:translateY(-3px);border-color:rgba(var(--b-rgb),.5);box-shadow:0 12px 30px rgba(var(--a-rgb),.12)}.kx-tool>span:nth-child(2){min-width:0;flex:1}.kx-tool b,.kx-tool small{display:block}.kx-tool b{font:700 14px "Space Grotesk"}.kx-tool small{color:var(--muted);font-size:10px;line-height:1.45;margin-top:4px}.kx-tool>svg{width:15px;flex:none;color:var(--muted)}.kx-tool-icon{width:38px;height:38px;display:grid;place-items:center;flex:none;border-radius:12px;background:rgba(var(--a-rgb),.15);color:var(--b)}.kx-tool-icon svg{width:19px}.kx-lab-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:16px}.kx-topics{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 12px;scrollbar-width:thin}.kx-topic{flex:none;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:rgba(var(--field),.45);color:var(--muted);font-size:11px;font-weight:800;white-space:nowrap}.kx-topic.active{background:linear-gradient(120deg,var(--b),var(--a));color:var(--ink);border-color:transparent;box-shadow:0 6px 20px rgba(var(--a-rgb),.2)}.kx-tier-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 13px}.kx-tier-head h4,.kx-trophy-head h4{font:700 16px "Space Grotesk";margin:0}.kx-tier-head span,.kx-trophy-head span{font-size:10px;color:var(--muted)}.kx-tier-actions{display:flex;gap:4px}.kx-tier-actions .icon-btn{width:31px;height:31px}.kx-tier-board{display:grid;gap:9px}.kx-tier-row{display:grid;grid-template-columns:54px minmax(0,1fr);gap:9px;min-width:0}.kx-tier-label{display:grid;place-items:center;border-radius:12px;background:linear-gradient(145deg,rgba(var(--a-rgb),.25),rgba(var(--b-rgb),.1));border:1px solid var(--line);color:var(--b);min-height:98px}.kx-tier-label b{font:800 21px "Space Grotesk"}.kx-tier-label.tier-s{background:linear-gradient(145deg,rgba(var(--b-rgb),.42),rgba(var(--a-rgb),.14));color:var(--b)}.kx-tier-label.tier-a{background:linear-gradient(145deg,rgba(var(--a-rgb),.3),rgba(var(--b-rgb),.08))}.kx-tier-label.tier-b{background:linear-gradient(145deg,rgba(var(--a-rgb),.2),rgba(var(--field),.25))}.kx-tier-label.tier-c{background:rgba(var(--a-rgb),.1)}.kx-tier-label.tier-d{background:rgba(var(--field),.4);color:var(--muted)}.kx-tier-drop{display:flex;flex-wrap:wrap;align-content:flex-start;align-items:flex-start;gap:8px;min-height:98px;padding:8px;border:1px solid var(--line);border-radius:13px;background:rgba(var(--field),.32);transition:background .18s,border-color .18s}.kx-tier-drop.drag-over{background:rgba(var(--a-rgb),.14);border-color:var(--b);box-shadow:inset 0 0 0 1px var(--b)}.kx-tier-drop.kx-drop-ready{background:rgba(var(--a-rgb),.1);border-color:rgba(var(--b-rgb),.55)}.kx-tier-empty{align-self:center;margin:auto;color:var(--muted);font-size:10px;opacity:.7}.kx-char{width:70px;min-width:0;padding:0;border:0;background:transparent;color:var(--text);text-align:center;cursor:grab}.kx-char.dragging{opacity:.35}.kx-char-poster{position:relative;display:grid;place-items:center;width:68px;height:68px;margin:auto;overflow:hidden;border-radius:13px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(var(--a-rgb),.2),rgba(var(--field),.5));color:var(--b);font:700 24px "Space Grotesk"}.kx-char-poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.kx-char b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:5px;font-size:9px}.kx-char small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:8px;margin-top:2px}.kx-board-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}.kx-board-foot>span{font-size:10px;color:var(--muted)}.kx-stats-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:4px 0 22px}.kx-stat{padding:14px;border:1px solid var(--line);border-radius:14px;background:rgba(var(--field),.35)}.kx-stat b{display:block;font:800 25px "Space Grotesk";color:var(--b)}.kx-stat small{font-size:10px;color:var(--muted)}.kx-trophy-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:4px 0 12px}.kx-trophies{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.kx-trophy{min-width:0;padding:12px 8px;text-align:center;border:1px solid var(--line);border-radius:13px;background:rgba(var(--field),.3);opacity:.52;filter:grayscale(.7)}.kx-trophy.unlocked{opacity:1;filter:none;background:linear-gradient(145deg,rgba(var(--a-rgb),.2),rgba(var(--field),.4));border-color:rgba(var(--b-rgb),.32)}.kx-trophy-icon{display:grid;place-items:center;width:32px;height:32px;margin:0 auto 7px;border-radius:10px;background:rgba(var(--a-rgb),.15);color:var(--b)}.kx-trophy-icon svg{width:17px}.kx-trophy b{display:block;font-size:10px}.kx-trophy small{display:block;margin-top:4px;font-size:8px;line-height:1.35;color:var(--muted)}.kx-trophy-mark{font-size:28px;color:var(--b);text-shadow:0 0 20px rgba(var(--a-rgb),.5)}.kx-suggestions{display:flex;flex-wrap:wrap;gap:7px}.kx-suggestions button{border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:rgba(var(--a-rgb),.08);color:var(--b);font-size:10px;font-weight:700}.kx-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}.kx-delete-topic{justify-self:start;color:#fca5a5}.kx-duel-modal{width:min(720px,100%)}.kx-duel-box{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:10px}.kx-duel-card{min-width:0;padding:0 0 13px;border:1px solid var(--line);border-radius:16px;overflow:hidden;background:rgba(var(--field),.55);color:var(--text);text-align:left;transition:opacity .25s,transform .25s}.kx-duel-card:hover{border-color:var(--b);transform:translateY(-2px)}.kx-duel-card.winner{border-color:#6ee7b7;box-shadow:0 0 24px rgba(52,211,153,.15)}.kx-duel-card.loser{opacity:.25}.kx-duel-poster{display:grid;place-items:center;aspect-ratio:3/4;background:linear-gradient(135deg,rgba(var(--a-rgb),.2),rgba(var(--field),.6));color:var(--b);font:800 44px "Space Grotesk"}.kx-duel-poster img{width:100%;height:100%;object-fit:cover}.kx-duel-card strong{display:block;padding:10px 12px 0;font:700 14px "Space Grotesk"}.kx-vs{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--b),var(--a));color:var(--ink);font:900 12px "Space Grotesk";box-shadow:0 0 24px rgba(var(--a-rgb),.4)}.kx-duel-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:15px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:11px}.kx-roll-result{min-height:210px;display:grid;align-items:center;padding:10px 0}.kx-roll-card{display:grid;grid-template-columns:112px minmax(0,1fr);gap:17px;align-items:center}.kx-roll-poster{aspect-ratio:3/4;display:grid;place-items:center;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,rgba(var(--a-rgb),.22),rgba(var(--field),.6));color:var(--b);font:800 38px "Space Grotesk"}.kx-roll-poster img{width:100%;height:100%;object-fit:cover}.kx-roll-card h3{font:700 23px "Space Grotesk";margin:5px 0}.kx-roll-card p{color:var(--muted);font-size:12px;line-height:1.5}.kx-roll-card small{color:var(--b);font-size:10px}.kx-roll-spin{font:800 clamp(22px,5vw,34px) "Space Grotesk";text-align:center;padding:35px 8px;animation:appear .2s}.kx-preview-image{display:block;width:100%;max-height:60vh;object-fit:contain;border-radius:13px;border:1px solid var(--line);background:var(--base1);margin:0 0 15px}
+@media(max-width:860px){.kx-tool-grid{grid-template-columns:1fr}.kx-lab-grid{grid-template-columns:1fr}.kx-watch-grid{grid-template-columns:1fr}.kx-panel{padding:17px}.kx-trophies{grid-template-columns:repeat(3,minmax(0,1fr))}.kx-profile-strip{flex-wrap:wrap}.kx-profile-copy{min-width:calc(100% - 65px)}.kx-profile-stat{flex:1}.kx-section-title{margin-top:40px}}
+@media(max-width:520px){.kx-tier-row{grid-template-columns:42px minmax(0,1fr);gap:6px}.kx-tier-label{min-height:84px}.kx-tier-drop{min-height:84px;padding:6px;gap:6px}.kx-char{width:58px}.kx-char-poster{width:56px;height:56px}.kx-char b{font-size:8px}.kx-board-foot{align-items:flex-start;flex-direction:column}.kx-trophies{grid-template-columns:repeat(3,minmax(0,1fr))}.kx-trophy{padding:9px 5px}.kx-tool{padding:13px}.kx-roll-card{grid-template-columns:90px minmax(0,1fr)}.kx-fav-filter{font-size:10px}}
+
+/* ---------- Sharing controls + public community boards ---------- */
+.kx-sharing,.kx-community{margin-top:28px}
+.kx-sharing-mark,.kx-community-mark{width:38px;height:38px;display:grid;place-items:center;flex-shrink:0;border:1px solid var(--line);border-radius:11px;color:var(--b);background:rgba(var(--a-rgb),.12)}
+.kx-sharing-mark svg,.kx-community-mark svg{width:19px;height:19px}
+.kx-share-list{display:grid;gap:10px}
+.share-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(var(--a-rgb),.06)}
+.share-row .lite-copy{display:grid;gap:3px;min-width:0}
+.share-row .lite-copy strong{display:flex;align-items:center;gap:7px;font-size:13px}
+.share-row .lite-copy strong svg{width:15px;height:15px;color:var(--b)}
+.share-row .lite-copy span{font-size:12px;line-height:1.5;color:var(--muted)}
+.kx-community-toolbar{margin-top:14px}
+.kx-community-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,.6fr);gap:14px;align-items:start}
+.kx-mini-title{margin:0 0 9px;font:700 12px "Space Grotesk";letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kx-public-board .kx-char{cursor:default}
+.kx-public-board .kx-tier-drop{min-height:58px}
+.kx-public-board .kx-tier-empty{opacity:.45}
+.kx-community .kx-trophies{grid-template-columns:repeat(2,minmax(0,1fr))}
+.kx-community .kx-trophy{min-height:118px}
+:focus-visible{outline:2px solid var(--b);outline-offset:2px}
+.modal-backdrop.open{animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0}}
+
+/* ---------- Smart roll filters ---------- */
+.kx-roll-filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px}
+.kx-roll-chip{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(var(--field),.4);color:var(--muted);font:700 10px "DM Sans";letter-spacing:.02em;transition:.18s}
+.kx-roll-chip:hover{border-color:rgba(var(--b-rgb),.5);color:var(--text)}
+.kx-roll-chip.active{background:linear-gradient(120deg,rgba(var(--b-rgb),.9),rgba(var(--a-rgb),.85));color:var(--ink);border-color:transparent;box-shadow:0 6px 18px rgba(var(--a-rgb),.18)}
+.kx-roll-meta{margin:0 0 10px;color:var(--muted);font-size:10px;line-height:1.5}
+.kx-roll-meta b{color:var(--b)}
+
+/* ---------- Small-screen polish (Lab + new panels) ---------- */
+@media(max-width:860px){
+ .kx-community-grid{grid-template-columns:1fr}
+ .kx-community .kx-panel-head,.kx-sharing .kx-panel-head{flex-direction:column;align-items:flex-start}
+ .kx-trophies{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .kx-trophy small{font-size:9px}
+ .kx-char b{font-size:10px}
+ .kx-char small{font-size:9px}
+}
+@media(max-width:520px){
+ .share-row{padding:10px 11px;gap:10px}
+ .share-row .lite-copy span{font-size:11px}
+ .kx-tier-actions .icon-btn,.easter-egg{width:40px;height:40px}
+ .kx-community .kx-trophies{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(hover:none){
+ .kx-char.picked{outline:2px solid var(--b);outline-offset:2px}
+}
 </style>
 </head>
 <body class="locked">
@@ -419,26 +523,28 @@ html[data-lite="1"] .premium-member-note{animation:none}
   <div class="gate-brand"><span class="brand-mark"><i data-lucide="book-open"></i></span><span>KIROKU<span class="brand-dot">.</span></span><small>記録 · YOUR ANIME ARCHIVE</small></div>
   <div class="eyebrow">Members only · Premium access</div>
   <h1>Welcome <span class="gradient">back.</span></h1>
-  <p class="gate-copy">Sign in to enter your archive. Your ranking is private to your account in this browser.</p>
+  <p class="gate-copy">Sign in with your email to enter your archive. Everything is synced securely across your devices.</p>
   <form class="form-grid" id="loginForm">
-   <label class="form-label">Username<input class="field" id="gateUsername" autocomplete="username" required placeholder="Your username"></label>
-   <label class="form-label">Password<input class="field" id="gatePassword" type="password" autocomplete="current-password" required placeholder="Your password"></label>
+   <label class="form-label">Email<input class="field" id="gateEmail" type="email" autocomplete="email" required placeholder="you@example.com" aria-label="Email"></label>
+   <label class="form-label">Password<input class="field" id="gatePassword" type="password" autocomplete="current-password" required placeholder="Your password" aria-label="Password"></label>
    <button class="btn primary" type="submit" id="loginButton"><i data-lucide="log-in"></i> Enter KIROKU</button>
   </form>
-  <p class="form-help gate-help">Invited premium accounts are preloaded. New accounts can be created by signed-in premium members.</p>
+  <div class="gate-register"><span>New to the group?</span> <button class="text-link" type="button" id="openRegister">Create an account</button></div>
+  <p class="form-help gate-help">Email + password.</p>
   <div class="gate-foot">和 · KEEP YOUR PEAKLIST CLOSE</div>
  </div>
 </div>
 
 <!-- MODALS -->
-<div class="modal-backdrop" id="createUserModal"><div class="modal">
- <div class="modal-head"><h2>Create a premium account ✦</h2><button class="close" data-close="createUserModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+<div class="modal-backdrop" id="createUserModal" role="dialog" aria-modal="true" aria-labelledby="createUserTitle"><div class="modal">
+ <div class="modal-head"><h2 id="createUserTitle">Create your KIROKU account</h2><button class="close" data-close="createUserModal" aria-label="Close"><i data-lucide="x"></i></button></div>
  <form class="form-grid" id="createUserForm">
-  <label class="form-label">New username<input class="field" id="newUsername" required minlength="3" maxlength="28" autocomplete="off" placeholder="Choose a username"></label>
+  <label class="form-label">Public username<input class="field" id="newUsername" required minlength="3" maxlength="28" autocomplete="username" placeholder="Choose a username"></label>
+  <label class="form-label">Email<input class="field" id="newEmail" type="email" required autocomplete="email" placeholder="you@example.com"></label>
   <label class="form-label">Password<input class="field" id="newPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="At least 8 characters"></label>
-  <button class="btn primary" type="submit"><i data-lucide="user-plus"></i> Create premium account</button>
+  <button class="btn primary" type="submit" id="registerButton"><i data-lucide="user-plus"></i> Join KIROKU</button>
  </form>
- <p class="form-help">Premium members only. New accounts receive the premium badge and start with an empty personal ranking.</p>
+ <p class="form-help">Your username is public, your email is not. Password: at least 8 characters. If asked to confirm your email, open the link in your inbox to finish signup.</p>
 </div></div>
 
 <div class="modal-backdrop" id="welcomeNotice"><div class="modal welcome-modal">
@@ -453,8 +559,9 @@ html[data-lite="1"] .premium-member-note{animation:none}
   <label class="form-label">Anime title<input class="field" id="cardTitle" required maxlength="80" placeholder="e.g. Fullmetal Alchemist: Brotherhood"></label>
   <label class="form-label">Short description<textarea class="field" id="cardNote" rows="2" maxlength="220" placeholder="Why is it on your list?"></textarea></label>
   <label class="form-label">Tag<input class="field" id="cardTag" maxlength="35" placeholder="#1 · THE GOAT"></label>
+  <label class="form-label">Watch status<select class="field" id="cardStatus"><option value="watching">Watching</option><option value="completed">Completed</option><option value="plan_to_watch" selected>Plan to Watch</option><option value="dropped">Dropped</option><option value="on_hold">On Hold</option></select></label>
   <label class="form-label">Cover image URL <span class="form-help">Optional. Paste a direct image link, or upload below. With no cover, KIROKU looks one up automatically.</span><input class="field" id="cardImage" placeholder="https://..."></label>
-  <label class="form-label">Or upload poster <span class="form-help" id="cardImageHint"></span><input class="field" id="cardFile" type="file" accept="image/*"></label>
+  <label class="form-label">Or upload poster <span class="form-help" id="cardImageHint"></span><input class="field" id="cardFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><span class="upload-warn">⚠ Uploading from a phone gallery can fail — not recommended. Paste an image link above instead (more reliable).</span></label>
   <button class="btn primary" type="submit"><i data-lucide="save"></i> Save card</button>
  </form>
 </div></div>
@@ -480,7 +587,6 @@ html[data-lite="1"] .premium-member-note{animation:none}
   <button class="btn ghost small" id="userButton" aria-label="Account"><i data-lucide="user-round"></i><span class="login-label">Log in</span></button>
   <button class="btn small logout-button" id="logoutButton" data-do="logout" style="display:none" aria-label="Log out" title="Log out"><i data-lucide="log-out"></i><span>Log out</span></button>
   <button class="btn primary small" data-do="add"><i data-lucide="plus"></i> My gems</button>
-  <button class="btn small invite-button" id="inviteButton" data-do="create-user" aria-label="Add user" title="Add user"><i data-lucide="user-plus"></i> Add user</button>
  </div>
 </nav></div>
 
@@ -522,6 +628,11 @@ html[data-lite="1"] .premium-member-note{animation:none}
   <select class="field select" id="sortSelect"><option value="rank">Rank order</option><option value="az">A – Z</option><option value="favorites">Favourites first</option></select>
  </div>
  <div class="tier-list" id="tierList"></div>
+ <div class="section-title" style="margin-top:42px"><div><h2>Friends’ archives</h2><p>Browse everyone’s rankings. You can add a friend’s gem to your own list, but only its owner can edit it.</p></div></div>
+ <div class="kx-panel kx-group-watch"><div class="kx-panel-head"><div><div class="eyebrow">GROUP ACTIVITY</div><h3>Currently watching</h3><p>See what members have marked as watching, synced across devices.</p></div><span class="kx-live-dot">SYNCED</span></div><div id="kxGroupWatching" class="kx-watch-grid"><div class="empty">Loading group activity…</div></div></div>
+ <div class="toolbar friend-toolbar"><select class="field select" id="friendSelect" aria-label="Choose a friend"><option value="">Loading friends…</option></select><select class="field select" id="friendStatusFilter" aria-label="Filter friend list"><option value="all">All statuses</option><option value="watching">Watching</option><option value="completed">Completed</option><option value="plan_to_watch">Plan to watch</option><option value="on_hold">On hold</option><option value="dropped">Dropped</option></select><label class="kx-fav-filter" for="friendFavoritesOnly"><input type="checkbox" id="friendFavoritesOnly"><span class="kx-fav-box" aria-hidden="true"></span><span>♥ Favourites only</span></label></div>
+ <div id="kxFriendMeta" class="kx-friend-meta"></div>
+ <div class="tier-list" id="friendArchiveList"><div class="empty">Your friends’ archives will appear here.</div></div>
  <div class="premium"><div><div class="eyebrow">✦ Kiroku premium</div><h2>Make your rankings legendary.</h2><p>Unlock the premium experience: extra customization, more list slots, exclusive themes and a supporter badge. Contact us on Telegram to get access.</p></div><button class="btn primary" data-do="premium"><i data-lucide="crown"></i> Get Premium</button></div>
 </section>
 
@@ -550,6 +661,33 @@ html[data-lite="1"] .premium-member-note{animation:none}
   <div class="feature"><div class="feature-icon"><i data-lucide="file-json"></i></div><h3>Backup & restore</h3><p>Export your list as JSON and import it later or move it to another device.</p></div>
   <div class="feature"><div class="feature-icon"><i data-lucide="share-2"></i></div><h3>Shareable direction</h3><p>Copy a text version of your ranking to share with friends or post in your community.</p></div>
  </div>
+ <div class="section-title kx-section-title"><div><div class="eyebrow">KIROKU LAB</div><h2>Character boards & tools</h2><p>Tierlists, duels, random picks, achievements and shareable cards — all saved to your account.</p></div></div>
+ <div class="kx-tool-grid">
+  <button class="kx-tool" type="button" data-kx-action="duel"><span class="kx-tool-icon"><i data-lucide="swords"></i></span><span><b>Anime Duel</b><small>Choose the better anime and build an Elo ranking.</small></span><i data-lucide="arrow-up-right"></i></button>
+  <button class="kx-tool" type="button" data-kx-action="roll"><span class="kx-tool-icon"><i data-lucide="dice-5"></i></span><span><b>Random Roll</b><small>Let fate choose what you watch next.</small></span><i data-lucide="arrow-up-right"></i></button>
+  <button class="kx-tool" type="button" data-kx-action="top5"><span class="kx-tool-icon"><i data-lucide="image"></i></span><span><b>Top 5 Card</b><small>Generate a themed image of your top anime.</small></span><i data-lucide="arrow-up-right"></i></button>
+ </div>
+ <div class="kx-lab-grid">
+  <section class="kx-panel" id="kxTierPanel">
+   <div class="kx-panel-head"><div><div class="eyebrow">YOUR CHARACTERS</div><h3>Character tierlists</h3><p>Create custom topics and rank characters from S to D.</p></div><button class="btn small" type="button" data-kx-action="new-topic"><i data-lucide="plus"></i> New topic</button></div>
+   <div id="kxTopics" class="kx-topics"></div>
+   <div class="kx-tier-head"><div><h4 id="kxTopicName">Best villains</h4><span id="kxTopicCount">0 characters</span></div><div class="kx-tier-actions"><button class="icon-btn" type="button" data-kx-action="edit-topic" title="Edit topic"><i data-lucide="pencil"></i></button><button class="icon-btn" type="button" data-kx-action="reset-tiers" title="Reset tiers"><i data-lucide="rotate-ccw"></i></button><button class="icon-btn" type="button" data-kx-action="export-tiers" title="Export image"><i data-lucide="image-down"></i></button></div></div>
+   <div id="kxTierBoard" class="kx-tier-board"><div class="empty">Loading your character boards…</div></div>
+   <div class="kx-board-foot"><button class="btn primary" type="button" data-kx-action="add-char"><i data-lucide="plus"></i> Add character</button><span>Tap to edit · Drag to move</span></div>
+  </section>
+  <section class="kx-panel">
+   <div class="kx-panel-head"><div><div class="eyebrow">YOUR PROGRESS</div><h3>Stats & trophies</h3><p>Achievements are private to your account and sync across devices.</p></div><span class="kx-trophy-mark">✦</span></div>
+   <div id="kxStats" class="kx-stats-grid"></div>
+   <div class="kx-trophy-head"><h4>Achievements</h4><span id="kxTrophyCount">0 / 9 unlocked</span></div>
+   <div id="kxTrophies" class="kx-trophies"></div>
+  </section>
+ </div>
+ <section class="kx-panel kx-community" id="kxCommunity">
+  <div class="kx-panel-head"><div><div class="eyebrow">THE GROUP</div><h3>Community boards & trophies</h3><p>Browse tier lists and achievements shared by other members. Read-only — only the owner can edit them.</p></div><span class="kx-community-mark">✦</span></div>
+  <div class="toolbar kx-community-toolbar"><select class="field select" id="communitySelect" aria-label="Choose a member"><option value="">Loading members…</option></select><button class="btn small" type="button" id="communityRefresh"><i data-lucide="refresh-cw"></i> Refresh</button></div>
+  <div id="communityMeta" class="kx-friend-meta"></div>
+  <div class="kx-community-grid"><div><h4 class="kx-mini-title">Character tierlist</h4><div id="communityBoard" class="kx-tier-board kx-public-board"><div class="empty">Pick a member to see their board.</div></div></div><div><h4 class="kx-mini-title">Achievements</h4><div id="communityTrophies" class="kx-trophies"><div class="empty">Pick a member to see their trophies.</div></div></div></div>
+ </section>
  <div class="premium"><div><div class="eyebrow">✦ Support the project</div><h2>Want the premium badge?</h2><p>Premium access is currently handled manually. Message the project owner on Telegram for details.</p></div><button class="btn primary" data-do="premium"><i data-lucide="send"></i> Telegram</button></div>
 </section>
 
@@ -571,6 +709,15 @@ html[data-lite="1"] .premium-member-note{animation:none}
    <button class="switch" id="liteSwitch" type="button" role="switch" aria-checked="false" aria-label="Lite mode" data-do="lite"><span></span></button>
   </div>
  </div>
+ <section class="kx-panel kx-sharing">
+  <div class="kx-panel-head"><div><div class="eyebrow">VISIBILITY</div><h3>What the group can see</h3><p>These switches are available to every member. Your data is private by default in the database; only what you enable here is exposed to others.</p></div><span class="kx-sharing-mark"><i data-lucide="shield-check"></i></span></div>
+  <div class="kx-share-list">
+   <div class="share-row"><div class="lite-copy"><strong><i data-lucide="list"></i> Anime ranking</strong><span id="shareAnimeHint">Let other members browse your ranked anime list in Friends’ archives.</span></div><button class="switch" id="shareAnimeSwitch" type="button" role="switch" aria-checked="true" aria-label="Share anime ranking" data-do="share-anime"><span></span></button></div>
+   <div class="share-row"><div class="lite-copy"><strong><i data-lucide="layers"></i> Character tierlists</strong><span id="shareTiersHint">Show your character boards in Community boards.</span></div><button class="switch" id="shareTiersSwitch" type="button" role="switch" aria-checked="true" aria-label="Share character tierlists" data-do="share-tiers"><span></span></button></div>
+   <div class="share-row"><div class="lite-copy"><strong><i data-lucide="trophy"></i> Achievements</strong><span id="shareTrophiesHint">Show unlocked trophies next to your community profile.</span></div><button class="switch" id="shareTrophiesSwitch" type="button" role="switch" aria-checked="true" aria-label="Share achievements" data-do="share-trophies"><span></span></button></div>
+  </div>
+  <p class="theme-status" id="shareStatus" aria-live="polite">Sharing settings are synced with your account.</p>
+ </section>
  <div class="feature-grid">
   <div class="feature"><div class="feature-icon"><i data-lucide="palette"></i></div><h3>Exclusive themes</h3><p>More colour palettes and profile styling.</p></div>
   <div class="feature"><div class="feature-icon"><i data-lucide="list-plus"></i></div><h3>More list slots</h3><p>Keep separate rankings for genres, seasons or all-time favourites.</p></div>
@@ -583,12 +730,24 @@ html[data-lite="1"] .premium-member-note{animation:none}
 <footer><span>© 2026 KIROKU · アニメの記録</span><span class="footer-right"><a href="https://t.me/kirokuBYilyabot" target="_blank" rel="noopener">Support</a><a href="https://t.me/naeci_NZ" target="_blank" rel="noopener">Report a bug</a><span>Made by Ilya · 和の記録 ✦ <button class="easter-egg" data-do="easter" title="A tiny secret" aria-label="A tiny secret">?</button></span></span></footer>
 </main>
 
+
+<div class="modal-backdrop" id="kxTopicModal"><div class="modal">
+ <div class="modal-head"><h2 id="kxTopicModalTitle">New topic</h2><button class="close" data-close="kxTopicModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+ <form class="form-grid" id="kxTopicForm"><label class="form-label">Topic name<input class="field" id="kxTopicInput" maxlength="40" required placeholder="Best villains"></label><div class="kx-suggestions" id="kxTopicSuggestions"><button type="button" data-kx-suggestion="Best heroes">Best heroes</button><button type="button" data-kx-suggestion="Best villains">Best villains</button><button type="button" data-kx-suggestion="Strongest">Strongest</button><button type="button" data-kx-suggestion="Favourite characters">Favourite characters</button></div><div class="kx-modal-actions"><button class="btn ghost" type="button" data-close="kxTopicModal">Cancel</button><button class="btn primary" type="submit">Save topic</button></div><button class="btn ghost kx-delete-topic" type="button" id="kxDeleteTopic">Delete topic</button></form>
+</div></div>
+<div class="modal-backdrop" id="kxCharModal"><div class="modal">
+ <div class="modal-head"><h2 id="kxCharModalTitle">Add character</h2><button class="close" data-close="kxCharModal" aria-label="Close"><i data-lucide="x"></i></button></div>
+ <form class="form-grid" id="kxCharForm"><label class="form-label">Character name<input class="field" id="kxCharName" required maxlength="60" placeholder="Ryomen Sukuna"></label><label class="form-label">Anime / source<input class="field" id="kxCharFrom" maxlength="60" placeholder="Jujutsu Kaisen"></label><label class="form-label">Tier<select class="field" id="kxCharTier"><option value="S">S</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="">Unranked</option></select></label><label class="form-label">Portrait URL<input class="field" id="kxCharImage" placeholder="https://..."></label><label class="form-label">Or upload portrait<input class="field" id="kxCharFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><span class="upload-warn">⚠ Uploading from a phone gallery can fail — not recommended. Use the portrait URL above instead.</span></label><div class="kx-modal-actions"><button class="btn ghost" type="button" data-close="kxCharModal">Cancel</button><button class="btn primary" type="submit">Save character</button></div><button class="btn ghost kx-delete-topic" type="button" id="kxDeleteChar">Delete character</button></form>
+</div></div>
+<div class="modal-backdrop" id="kxDuelModal"><div class="modal kx-duel-modal"><div class="modal-head"><h2>Which anime is better?</h2><button class="close" data-close="kxDuelModal" aria-label="Close"><i data-lucide="x"></i></button></div><div id="kxDuelBox" class="kx-duel-box"></div><div class="kx-duel-foot"><span id="kxDuelRound">Round 1</span><button class="btn primary" type="button" id="kxDuelApply" disabled>Apply ranking</button></div></div></div>
+<div class="modal-backdrop" id="kxRollModal"><div class="modal"><div class="modal-head"><h2>Tonight you watch…</h2><button class="close" data-close="kxRollModal" aria-label="Close"><i data-lucide="x"></i></button></div><div class="kx-roll-filters" id="kxRollFilters" role="group" aria-label="Roll filters"><button class="kx-roll-chip" type="button" data-roll-status="plan_to_watch">Plan to watch</button><button class="kx-roll-chip" type="button" data-roll-status="watching">Watching</button><button class="kx-roll-chip" type="button" data-roll-status="on_hold">On hold</button><button class="kx-roll-chip" type="button" data-roll-status="completed">Completed</button><button class="kx-roll-chip" type="button" data-roll-status="dropped">Dropped</button><button class="kx-roll-chip" type="button" data-roll-extra="favorites">♥ Faves</button><button class="kx-roll-chip" type="button" data-roll-extra="avoidRecent">No repeats</button></div><p class="kx-roll-meta" id="kxRollMeta" aria-live="polite"></p><div id="kxRollResult" class="kx-roll-result"></div><button class="btn primary" type="button" id="kxRollAgain"><i data-lucide="dice-5"></i> Roll again</button></div></div>
+<div class="modal-backdrop" id="kxImageModal"><div class="modal"><div class="modal-head"><h2>Your KIROKU image</h2><button class="close" data-close="kxImageModal" aria-label="Close"><i data-lucide="x"></i></button></div><img id="kxPreviewImage" class="kx-preview-image" alt="KIROKU export preview"><div class="kx-modal-actions"><button class="btn ghost" type="button" data-close="kxImageModal">Close</button><button class="btn" type="button" id="kxShareImage"><i data-lucide="share-2"></i> Share</button><button class="btn primary" type="button" id="kxDownloadImage"><i data-lucide="download"></i> Save image</button></div></div></div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 "use strict";
-// KIROKU — local-browser prototype. Accounts and lists live in this browser only;
-// this is NOT secure server authentication.
+// KIROKU — Supabase-backed anime archive with shared community boards.
 
 /* ---------------- Settings & data ---------------- */
 const TELEGRAM = "https://t.me/kirokuBYilyabot";
@@ -605,10 +764,10 @@ const THEMES = {
 };
 
 const SEEDS = [
- {username:"ilyadepp10",hash:"a66ff79b6a4dc427e65a84ffc8e82341496e17ad0e50bc20845966fbaa458e59",role:"admin",premium:true,icon:"code"},
- {username:"ibrohimT",hash:"405d1e68397166beb221f78f1e55b21604c07c233305b4347395e79e088d43b7",role:"member",premium:true,icon:"user-round"},
- {username:"asad_fem",hash:"df8e0e1095ed5c5cf19af1c33c2f17c41fde9bfd1d334f166e1d94128a9d7c82",role:"member",premium:true,icon:"flower-2",suffix:"🌸"},
- {username:"am0gus_sus_thelaststand1",hash:"35019b82fb0099f710a19f6fc8d8b288638fc590efc2e8fc4828cd7af92aa890",role:"member",premium:true,icon:"user-round"}
+ {username:"ilyadepp10",icon:"code"},
+ {username:"ibrohimT",icon:"user-round"},
+ {username:"asad_fem",icon:"flower-2",suffix:"🌸"},
+ {username:"am0gus_sus_thelaststand1",icon:"user-round"}
 ];
 
 const starterAnime = [
@@ -634,7 +793,7 @@ const getJSON = (k,d) => { try { const v = localStorage.getItem(k); return v==nu
 const setJSON = (k,v) => rawSet(k, JSON.stringify(v));
 const esc = s => String(s==null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const cleanId = (s,fallback) => String(s||"").replace(/[^\w-]/g,"").slice(0,60) || fallback;
-const cleanImg = u => { u = String(u||"").trim(); return /^(https?:\/\/|data:image\/)/i.test(u) ? u : ""; };
+const cleanImg = u => { u = String(u||"").trim(); return /^(https?:\/\/|data:image\/(png|jpe?g|webp|gif);base64,)/i.test(u) ? u : ""; };
 const icons = () => { if (window.lucide && lucide.createIcons) lucide.createIcons(); };
 const cloneStarter = () => starterAnime.map(a => Object.assign({}, a));
 
@@ -644,129 +803,245 @@ function showToast(msg){
  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2800);
 }
 
-/*SHA_START*/
-function sha256Hex(str){
- const utf8 = unescape(encodeURIComponent(str));
- const K = [], H = [];
- for (let p = 2, n = 0; n < 64; p++) {
-  let prime = true;
-  for (let d = 2; d*d <= p; d++) if (p % d === 0) { prime = false; break; }
-  if (!prime) continue;
-  if (n < 8) H[n] = (Math.pow(p, .5) % 1) * 4294967296 | 0;
-  K[n++] = (Math.pow(p, 1/3) % 1) * 4294967296 | 0;
+/* ---------------- Supabase account + shared data ---------------- */
+const SUPABASE_URL = "https://qslpbgegrqdvolwiuuaf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_UGmqV_qDl6cagFuRrniuJA_R3sttKJh";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const SHARE_KEYS = ["share_anime","share_tiers","share_trophies"];
+const DEFAULT_SHARING = {share_anime:true, share_tiers:true, share_trophies:true};
+const state = {user:null, anime:[], search:"", sort:"rank", view:"home", friendLists:[], community:[], pendingSave:Promise.resolve(), savingCount:0, realtime:null, authBooted:false};
+const profileDecoration = username => SEEDS.find(x => x.username.toLowerCase() === String(username||"").toLowerCase()) || {};
+const uuid = () => (crypto && crypto.randomUUID) ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==="x"?r:(r&3|8)).toString(16);});
+function mapDbAnime(row){
+ return {id:row.id, title:row.title, search:row.search_title||row.title, note:row.note||"", tag:row.tag||"", image:row.image_url||"", favorite:!!row.favorite, status:row.status||"plan_to_watch"};
+}
+function profileToUser(profile){
+ const deco=profileDecoration(profile.username);
+ const sharing={};SHARE_KEYS.forEach(k=>sharing[k]=profile[k]!==false);
+ return {id:profile.id, username:profile.username, display_name:profile.display_name||profile.username, role:profile.role||"member", premium:profile.premium!==false, icon:deco.icon||"user-round", suffix:deco.suffix||"", sharing};
+}
+const PROFILE_FIELDS = "id,username,display_name,role,premium,share_anime,share_tiers,share_trophies";
+async function fetchProfile(userId, authUser){
+ let {data:profile,error}=await db.from("profiles").select(PROFILE_FIELDS).eq("id",userId).maybeSingle();
+ if(error) throw error;
+ if(!profile){
+  // A signup can succeed before the profile trigger runs. Create the row from the auth user as a fallback.
+  const meta=(authUser&&authUser.user_metadata)||{};
+  const fallback=String(meta.username||meta.display_name||((authUser&&authUser.email)||"member").split("@")[0]).toLowerCase().replace(/[^a-z0-9_]/g,"_").slice(0,28)||"member";
+  const inserted=await db.from("profiles").insert({id:userId, username:fallback, display_name:meta.display_name||fallback, role:"member", premium:true}).select(PROFILE_FIELDS).single();
+  if(inserted.error) throw inserted.error;
+  profile=inserted.data;
  }
- const bytes = [];
- for (let i = 0; i < utf8.length; i++) bytes.push(utf8.charCodeAt(i));
- const bitLen = bytes.length * 8;
- bytes.push(0x80);
- while (bytes.length % 64 !== 56) bytes.push(0);
- const hi = Math.floor(bitLen / 4294967296), lo = bitLen >>> 0;
- [hi, lo].forEach(v => bytes.push(v>>>24 & 255, v>>>16 & 255, v>>>8 & 255, v & 255));
- const rotr = (x,n) => (x >>> n) | (x << (32 - n));
- for (let off = 0; off < bytes.length; off += 64) {
-  const w = [];
-  for (let i = 0; i < 16; i++) w[i] = (bytes[off+4*i]<<24) | (bytes[off+4*i+1]<<16) | (bytes[off+4*i+2]<<8) | bytes[off+4*i+3];
-  for (let i = 16; i < 64; i++) {
-   const s0 = rotr(w[i-15],7) ^ rotr(w[i-15],18) ^ (w[i-15] >>> 3);
-   const s1 = rotr(w[i-2],17) ^ rotr(w[i-2],19) ^ (w[i-2] >>> 10);
-   w[i] = (w[i-16] + s0 + w[i-7] + s1) | 0;
+ return profile;
+}
+async function loadOwnList(){
+ if(!state.user) return;
+ const {data,error}=await db.from("user_anime").select("id,user_id,catalog_id,title,search_title,note,tag,image_url,favorite,status,rank").eq("user_id",state.user.id).order("rank",{ascending:true}).order("created_at",{ascending:true});
+ if(error) throw error;
+ state.anime=(data||[]).map(mapDbAnime);
+ if(!state.anime.length){
+  // First-login migration: preserve this account's old local-browser list if present.
+  const localSaved=getJSON("kiroku_list_"+state.user.username.toLowerCase(),null);
+  if(Array.isArray(localSaved)){
+   state.anime=localSaved.map(a=>({...a,status:a.status||"plan_to_watch"}));
+   if(state.anime.length)await saveList();
+  }else if(state.user.role==="admin"){
+   state.anime=cloneStarter().map(a=>({...a,status:"plan_to_watch"}));
+   await saveList();
   }
-  let [a,b,c,d,e,f,g,h] = H;
-  for (let i = 0; i < 64; i++) {
-   const S1 = rotr(e,6) ^ rotr(e,11) ^ rotr(e,25), ch = (e & f) ^ (~e & g);
-   const t1 = (h + S1 + ch + K[i] + w[i]) | 0;
-   const S0 = rotr(a,2) ^ rotr(a,13) ^ rotr(a,22), maj = (a & b) ^ (a & c) ^ (b & c);
-   const t2 = (S0 + maj) | 0;
-   h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
-  }
-  H[0] = (H[0]+a)|0; H[1] = (H[1]+b)|0; H[2] = (H[2]+c)|0; H[3] = (H[3]+d)|0;
-  H[4] = (H[4]+e)|0; H[5] = (H[5]+f)|0; H[6] = (H[6]+g)|0; H[7] = (H[7]+h)|0;
  }
- return H.map(x => (x >>> 0).toString(16).padStart(8,"0")).join("");
 }
-/*SHA_END*/
-
-// Uses the browser's crypto when available, otherwise a built-in SHA-256
-// (so login also works when the page is opened over plain http).
-function hashPassword(username, password){
- const value = username.toLowerCase() + ":" + password + ":kiroku-demo-v1";
- if (window.crypto && crypto.subtle) {
-  return crypto.subtle.digest("SHA-256", new TextEncoder().encode(value))
-   .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join(""))
-   .catch(() => sha256Hex(value));
- }
- return Promise.resolve(sha256Hex(value));
-}
-
-/* ---------------- State & accounts ---------------- */
-const state = {user:null, anime:[], listKey:"", search:"", sort:"rank", view:"home"};
-
-function getUsers(){
- let list = getJSON("kiroku_users", null);
- if (!Array.isArray(list)) list = [];
- SEEDS.forEach(seed => {
-  const i = list.findIndex(u => u && String(u.username).toLowerCase() === seed.username.toLowerCase());
-  if (i < 0) list.push(Object.assign({}, seed)); else list[i] = Object.assign({}, list[i], seed);
- });
- setJSON("kiroku_users", list);
- return list;
-}
-
 function saveList(){
- if (!state.user || !state.listKey) return true;
- const ok = setJSON(state.listKey, state.anime);
- if (!ok) showToast("Storage is full — remove some uploaded posters.");
- return ok;
+ if(!state.user) return Promise.resolve(true);
+ const owner=state.user.id;
+ const isUuid=id=>/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id||""));
+ const rows=state.anime.map((item,index)=>{
+  const catalog=/^a\d+$/.test(String(item.id||""))?String(item.id):null;
+  if(!isUuid(item.id)) item.id=uuid();
+  return {id:item.id,user_id:owner,catalog_id:catalog,title:String(item.title||"Untitled"),search_title:String(item.search||item.title||""),note:String(item.note||""),tag:String(item.tag||""),image_url:String(item.image||""),favorite:!!item.favorite,status:item.status||"plan_to_watch",rank:index};
+ });
+ const ids=rows.map(r=>r.id);
+ const persist=async()=>{
+  state.savingCount++;
+  try{
+   if(rows.length){
+    const {error}=await db.from("user_anime").upsert(rows,{onConflict:"id"});
+    if(error) throw error;
+    const {error:deleteError}=await db.from("user_anime").delete().eq("user_id",owner).not("id","in",`(${ids.join(",")})`);
+    if(deleteError) throw deleteError;
+   }else{
+    const {error}=await db.from("user_anime").delete().eq("user_id",owner);
+    if(error) throw error;
+   }
+   return true;
+  }finally{state.savingCount=Math.max(0,state.savingCount-1);}
+ };
+ state.pendingSave=state.pendingSave.then(persist).catch(err=>{
+  console.error("KIROKU sync:",err);
+  showToast("Cloud sync failed. Your latest change was not saved.");
+  return false;
+ });
+ return state.pendingSave;
 }
-
-function loadAccount(){
- const session = rawGet("kiroku_session");
- const found = session && getUsers().find(u => u.username.toLowerCase() === session.toLowerCase());
- if (!found) {
-  rawDel("kiroku_session");
-  state.user = null; state.anime = []; state.listKey = "";
-  document.body.classList.add("locked"); $("loginGate").style.display = "grid";
-  loadTheme(); updateUserButton(); return;
+async function fetchPublicLab(ids){
+ if(!ids.length) return {};
+ const {data,error}=await db.from("kiroku_public_lab").select("user_id,tiers,trophies,updated_at").in("user_id",ids);
+ if(error){console.warn("Could not load shared boards",error);return {};}
+ const out={};(data||[]).forEach(r=>out[r.user_id]={tiers:r.tiers||null,trophies:r.trophies||{},updated_at:r.updated_at||""});
+ return out;
+}
+async function refreshFriendLists(){
+ if(!state.user) return;
+ const select=$("friendSelect");
+ const {data:profiles,error:pError}=await db.from("profiles").select(PROFILE_FIELDS).order("username").limit(500);
+ if(pError){console.warn("Could not load member profiles",pError);return;}
+ const people=(profiles||[]).filter(p=>p.id!==state.user.id && (p.share_anime!==false||p.share_tiers!==false||p.share_trophies!==false));
+ const animeIds=people.filter(p=>p.share_anime!==false).map(p=>p.id);
+ let rows=[];
+ if(animeIds.length){
+  const {data,error:rError}=await db.from("user_anime").select("id,user_id,title,search_title,note,tag,image_url,favorite,status,rank").in("user_id",animeIds).order("rank",{ascending:true}).limit(1000);
+  if(rError)console.warn("Could not load member lists",rError);else rows=data||[];
  }
- state.user = found;
- state.listKey = "kiroku_list_" + found.username.toLowerCase();
- const saved = getJSON(state.listKey, null);
- if (Array.isArray(saved)) state.anime = saved;
- else { state.anime = found.role === "admin" ? cloneStarter() : []; saveList(); }
- document.body.classList.remove("locked"); $("loginGate").style.display = "none";
- loadTheme(); updateUserButton(); renderAll(); showView("home");
+ const labs=await fetchPublicLab(people.map(p=>p.id));
+ state.friendLists=people.map(p=>({user:profileToUser(p),anime:rows.filter(r=>r.user_id===p.id).map(mapDbAnime),lab:labs[p.id]||null}));
+ if(select){
+  const previous=select.value, withAnime=state.friendLists.filter(f=>f.user.sharing.share_anime);
+  select.innerHTML=withAnime.length?withAnime.map(f=>`<option value="${esc(f.user.id)}">${esc(f.user.display_name||f.user.username)}${f.user.premium?" · ✦ PREMIUM":""}</option>`).join(""):`<option value="">No shared anime lists yet</option>`;
+  if(withAnime.some(f=>f.user.id===previous))select.value=previous;
+ }
+ renderFriendArchive();
+ renderCommunityPicker();
 }
-
-function updateUserButton(){
- const btn = $("userButton"), out = $("logoutButton"), invite = $("inviteButton"), u = state.user;
- if (u) {
-  btn.innerHTML = `<i data-lucide="${esc(u.icon||"user-round")}" class="${u.role==="admin"?"user-dev-icon":""}"></i><span class="login-label">${esc(u.username)}${esc(u.suffix||"")}</span><span class="premium-badge">✦ PREMIUM</span>`;
-  out.style.display = "inline-flex";
-  invite.style.display = u.premium ? "" : "none";
- } else {
-  btn.innerHTML = `<i data-lucide="user-round"></i><span class="login-label">Log in</span>`;
-  out.style.display = "none";
+function communityPeople(){return state.friendLists.filter(f=>f.user.sharing.share_tiers||f.user.sharing.share_trophies);}
+function renderCommunityPicker(previous){
+ const select=$("communitySelect");if(!select)return;
+ const people=communityPeople();
+ select.innerHTML=people.length?people.map(f=>`<option value="${esc(f.user.id)}">${esc(f.user.display_name||f.user.username)}</option>`).join(""):`<option value="">No shared boards yet</option>`;
+ const keep=previous||select.value;
+ if(people.some(f=>f.user.id===keep))select.value=keep;
+ renderCommunityBoard();
+}
+function renderCommunityBoard(){
+ const meta=$("communityMeta"),board=$("communityBoard"),trophies=$("communityTrophies");
+ if(!board||!trophies)return;
+ const select=$("communitySelect"),person=state.friendLists.find(f=>f.user.id===(select&&select.value)&&(f.user.sharing.share_tiers||f.user.sharing.share_trophies));
+ if(!person){if(meta)meta.innerHTML="";board.innerHTML='<div class="empty">Choose a member to browse their shared boards.</div>';trophies.innerHTML='<div class="empty">Achievements appear here.</div>';return;}
+ const name=person.user.display_name||person.user.username;
+ if(meta)meta.innerHTML=`<div class="kx-profile-strip"><span class="kx-profile-avatar">${esc(name.slice(0,1).toUpperCase())}</span><div class="kx-profile-copy"><b>${esc(name)}</b><small>@${esc(person.user.username)} · COMMUNITY</small></div><span class="kx-profile-stat"><b>${esc(person.anime.length)}</b><small>Anime</small></span></div>`;
+ const data=kxNorm(person.lab||{}),topic=data.tiers.topics.find(t=>t.id===data.tiers.active)||data.tiers.topics[0];
+ if(!person.user.sharing.share_tiers||!topic){
+  board.innerHTML=`<div class="empty">${person.user.sharing.share_tiers?"No character topic shared yet.":"This member keeps character boards private."}</div>`;
+ }else{
+  const chip=c=>`<div class="kx-char"><span class="kx-char-poster" data-kx-public="1" data-kx-name="${esc(c.name)}"><span>${esc(Array.from(c.name)[0]||"?")}</span>${cleanImg(c.image)?`<img src="${esc(c.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:""}</span><b>${esc(c.name)}</b><small>${esc(c.from||"Character")}</small></div>`;
+  board.innerHTML=`<h4 class="kx-mini-title">${esc(topic.name)}</h4>`+KX_TIERS.concat([""]).map(t=>`<div class="kx-tier-row"><div class="kx-tier-label tier-${t.toLowerCase()||"unranked"}"><b>${t||"—"}</b></div><div class="kx-tier-drop">${topic.chars.filter(c=>c.tier===t).map(chip).join("")||'<span class="kx-tier-empty">Empty</span>'}</div></div>`).join("");
+ }
+ if(!person.user.sharing.share_trophies){
+  trophies.innerHTML='<div class="empty">This member keeps achievements private.</div>';
+ }else{
+  const count=KX_TROPHIES.filter(t=>data.trophies[t.id]).length;
+  trophies.innerHTML=`<div class="kx-trophy-head"><h4>Achievements</h4><span>${count} / ${KX_TROPHIES.length}</span></div>`+KX_TROPHIES.map(t=>`<div class="kx-trophy ${data.trophies[t.id]?"unlocked":""}"><span class="kx-trophy-icon"><i data-lucide="${t.icon}"></i></span><b>${t.name}</b><small>${t.hint}</small></div>`).join("");
  }
  icons();
 }
-
+function renderFriendArchive(){
+ const select=$("friendSelect"), target=$("friendArchiveList"), meta=$("kxFriendMeta");
+ if(!target)return;
+ const chosen=state.friendLists.find(f=>f.user.id===(select&&select.value));
+ if(!chosen){if(meta)meta.innerHTML="";target.innerHTML='<div class="empty">No friends’ lists to show yet. They will appear here after they join KIROKU.</div>';renderGroupWatching();return;}
+ const status=$("friendStatusFilter")?.value||"all", favOnly=$("friendFavoritesOnly")?.checked||false;
+ let items=chosen.anime.slice();
+ if(status!=="all")items=items.filter(a=>(a.status||"plan_to_watch")===status);
+ if(favOnly)items=items.filter(a=>a.favorite);
+ const favCount=chosen.anime.filter(a=>a.favorite).length, watching=chosen.anime.filter(a=>a.status==="watching").length;
+ if(meta)meta.innerHTML=`<div class="kx-profile-strip"><span class="kx-profile-avatar">${esc((chosen.user.display_name||chosen.user.username).slice(0,1).toUpperCase())}</span><div class="kx-profile-copy"><b>${esc(chosen.user.display_name||chosen.user.username)}</b><small>@${esc(chosen.user.username)} · ${chosen.user.premium?"✦ PREMIUM":"MEMBER"}</small></div><span class="kx-profile-stat"><b>${chosen.anime.length}</b><small>Anime</small></span><span class="kx-profile-stat"><b>${favCount}</b><small>Favourites</small></span><span class="kx-profile-stat"><b>${watching}</b><small>Watching</small></span></div>`;
+ const localEntries=items.map((item,i)=>({item,rank:i+1}));   // friend lists use their own filters, not your search/sort
+ target.innerHTML=localEntries.length?localEntries.map(e=>cardHTML(e,{readOnly:true,canMove:false,total:items.length,owned:new Set(state.anime.map(a=>String(a.title).toLowerCase()))})).join(''):`<div class="empty">No anime match these filters.</div>`;
+ items.forEach(item=>{if(cleanImg(item.image))return;const poster=target.querySelector(`.poster[data-id="${CSS.escape(item.id)}"]`);if(poster)attachPoster(poster,item);});
+ renderGroupWatching();icons();
+}
+function renderGroupWatching(){
+ const target=$("kxGroupWatching");if(!target)return;
+ const entries=[];
+ if(state.user)state.anime.filter(a=>a.status==="watching").forEach(a=>entries.push({user:"You",item:a}));
+ state.friendLists.forEach(f=>f.anime.filter(a=>a.status==="watching").forEach(a=>entries.push({user:f.user.display_name||f.user.username,item:a})));
+ target.innerHTML=entries.length?entries.slice(0,12).map(x=>`<div class="kx-watch-card"><div class="kx-watch-poster">${cleanImg(x.item.image)?`<img class="cover" src="${esc(x.item.image)}" alt="" loading="lazy" data-id="${esc(x.item.id)}">`:`<span>${esc(Array.from(x.item.title)[0]||"?")}</span>`}</div><div class="kx-watch-copy"><b>${esc(x.item.title)}</b><small>${esc(x.user)} · Watching now</small></div><span class="kx-live-dot" aria-label="Watching">●</span></div>`).join(""):'<div class="kx-watch-empty">Nobody has marked an anime as currently watching yet.</div>';
+}
+async function startRealtime(){
+ if(state.realtime) await db.removeChannel(state.realtime);
+ const id=state.user.id;
+ state.realtime=db.channel("kiroku-live-"+id)
+  .on("postgres_changes",{event:"*",schema:"public",table:"user_anime",filter:"user_id=eq."+id},async()=>{
+   if(!state.user||state.savingCount>0)return;
+   try{await loadOwnList();renderAll();}catch(e){console.warn(e);}
+  })
+  .on("postgres_changes",{event:"*",schema:"public",table:"user_anime"},async payload=>{
+   if(!state.user)return;
+   const changed=(payload.new&&payload.new.user_id)||(payload.old&&payload.old.user_id);
+   if(changed&&changed!==state.user.id)await refreshFriendLists();
+  })
+  .on("postgres_changes",{event:"*",schema:"public",table:"user_kiroku_data"},async payload=>{
+   if(!state.user)return;
+   const changed=(payload.new&&payload.new.user_id)||(payload.old&&payload.old.user_id);
+   if(changed&&changed!==state.user.id)await refreshFriendLists();
+  })
+  .subscribe();
+}
+function handleSignedOut(message){
+ state.user=null;state.anime=[];state.friendLists=[];state.community=[];
+ if(state.realtime){db.removeChannel(state.realtime);state.realtime=null;}
+ if(typeof kxResetExtraData==="function")kxResetExtraData();
+ document.body.classList.add("locked");$("loginGate").style.display="grid";
+ const email=$("gateEmail");if(email)email.value="";
+ const pass=$("gatePassword");if(pass)pass.value="";
+ closeAllModals();showView("home",true);updateUserButton();loadTheme();syncSharingUI();
+ if(message)showToast(message);
+}
+let authLoading=false;
+async function loadAccount(session, welcome){
+ if(authLoading)return;
+ authLoading=true;
+ try{
+  if(!session){const {data}=await db.auth.getSession();session=data.session;}
+  if(!session){handleSignedOut();return;}
+  const profile=await fetchProfile(session.user.id, session.user);
+  state.user=profileToUser(profile);
+  await loadOwnList();
+  document.body.classList.remove("locked");$("loginGate").style.display="none";
+  loadTheme();updateUserButton();renderAll();showView("home");
+  await Promise.allSettled([refreshFriendLists(),startRealtime()]);
+  if(typeof kxLoadExtraData==="function")await kxLoadExtraData();
+  kxRenderAll();syncSharingUI();renderCommunityBoard();
+  if(welcome)showWelcome(state.user);
+ }catch(error){
+  console.error("KIROKU account load:",error);
+  handleSignedOut("Could not connect to KIROKU cloud. Check your connection and try again.");
+ }finally{authLoading=false;}
+}
+function updateUserButton(){
+ const btn=$("userButton"),out=$("logoutButton"),u=state.user;
+ if(u){
+  btn.innerHTML=`<i data-lucide="${esc(u.icon||"user-round")}" class="${u.role==="admin"?"user-dev-icon":""}"></i><span class="login-label">${esc(u.username)}${esc(u.suffix||"")}</span><span class="premium-badge">${u.premium?"✦ PREMIUM":"MEMBER"}</span>`;
+  out.style.display="inline-flex";
+ }else{btn.innerHTML='<i data-lucide="user-round"></i><span class="login-label">Log in</span>';out.style.display="none";}
+ icons();
+}
 function showWelcome(user){
- let title = "Welcome back, " + user.username + "!", symbol = "✦";
- let message = "Your personal KIROKU archive is ready. Every account has its own ranking and premium badge.";
- if (user.role === "admin") { title = "Developer access granted."; message = "Welcome, Ilya. Developer mode is active: the homepage showcase is editable through your account. The code icon marks your account."; symbol = "</>"; }
- if (user.username.toLowerCase() === "asad_fem") { title = "🌸 Welcome to KIROKU, asad_fem!"; message = "Your special sakura profile is active. Your premium badge is ready, and your personal gems list starts completely empty."; symbol = "🌸"; }
- $("welcomeTitle").textContent = title; $("welcomeMessage").textContent = message; $("welcomeSymbol").textContent = symbol;
- openModal("welcomeNotice");
+ let title="Welcome back, "+user.username+"!",symbol="✦";
+ let message="Your personal KIROKU archive is ready. Your list is synced with the group, and your Premium badge is active.";
+ if(user.role==="admin"){title="Developer access granted.";message="Welcome, Ilya. Developer mode is active: the homepage showcase is editable through your account. The code icon marks your account.";symbol="</>";}
+ if(user.username.toLowerCase()==="asad_fem"){title="🌸 Welcome to KIROKU, asad_fem!";message="Your special sakura profile is active. Your personal gems list starts completely empty.";symbol="🌸";}
+ $("welcomeTitle").textContent=title;$("welcomeMessage").textContent=message;$("welcomeSymbol").textContent=symbol;openModal("welcomeNotice");
 }
-
-function logout(){
- rawDel("kiroku_session");
- state.user = null; state.anime = []; state.listKey = "";
- document.body.classList.add("locked"); $("loginGate").style.display = "grid";
- $("gateUsername").value = ""; $("gatePassword").value = "";
- closeAllModals(); showView("home", true); updateUserButton(); loadTheme();
- showToast("Signed out safely.");
+async function logout(){
+ try{await db.auth.signOut();}catch(error){console.warn("Sign out:",error);}
+ handleSignedOut("Signed out safely.");
 }
+// Keeps tab/session changes in sync: a login or logout anywhere is reflected everywhere.
+db.auth.onAuthStateChange((event,session)=>{
+ if(!state.authBooted)return;
+ if(event==="SIGNED_IN"&&session&&(!state.user||state.user.id!==session.user.id))loadAccount(session,true);
+ else if(event==="SIGNED_OUT"&&state.user)handleSignedOut("Your session ended.");
+});
 
 /* ---------------- Themes ---------------- */
 function themeKey(){ return "kiroku_theme_" + (state.user ? state.user.username.toLowerCase() : "guest"); }
@@ -846,6 +1121,7 @@ function adoptHTML(it, opts){
   : `<div class="card-actions"><button class="btn small primary" data-act="adopt" data-id="${esc(it.id)}"><i data-lucide="plus"></i> Add to my list</button></div>`;
 }
 
+function statusLabel(status){return ({watching:"Watching now",completed:"Completed",plan_to_watch:"Plan to watch",dropped:"Dropped",on_hold:"On hold"})[status]||"Plan to watch";}
 function cardHTML(entry, opts){
  const it = entry.item, rank = entry.rank, id = esc(it.id), cover = cleanImg(it.image), n = String(rank).padStart(2,"0");
  const actions = opts.readOnly ? adoptHTML(it, opts) : `<div class="card-actions">
@@ -858,7 +1134,7 @@ function cardHTML(entry, opts){
   <div class="rank">${n}</div>
   <div class="entry">
    <div class="poster" data-id="${id}"><div class="poster-fallback">${esc(it.title)}</div>${cover ? `<img class="cover" src="${esc(cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-id="${id}">` : ""}</div>
-   <div class="info"><div class="number">${opts.readOnly ? "SHOWCASE" : "YOUR GEM"} // ${n}</div><div class="name">${esc(it.title)}</div><div class="note">${esc(it.note)}</div><div class="tag">${esc(it.tag || "PERSONAL PICK")}</div></div>
+   <div class="info"><div class="number">${opts.readOnly ? "SHOWCASE" : "YOUR GEM"} // ${n}</div><div class="name">${esc(it.title)}</div><div class="note">${esc(it.note)}</div><div class="chip-row"><div class="tag">${esc(it.tag || "PERSONAL PICK")}</div><div class="watch-status status-${esc(it.status||"plan_to_watch")}">${esc(statusLabel(it.status))}</div></div></div>
    ${actions}
   </div></article>`;
 }
@@ -892,6 +1168,8 @@ function renderAll(){
  $("showcaseNote").textContent = isAdmin
   ? "This is your public showcase, Ilya — only you (the developer) can edit it. Everyone else can add its gems to their own list."
   : "This tier list belongs to the developer, Ilya — only he can edit it. Like a gem? Add it to your own list.";
+ renderFriendArchive();
+ if(typeof kxRenderAll==="function"&&kxDataReady)kxRenderAll();
  icons();
 }
 
@@ -926,24 +1204,39 @@ function attachPoster(posterEl, item){
   posterEl.appendChild(img);
  });
 }
-// A broken cover link falls back to an automatic lookup, once.
+// Broken covers fall back to an automatic lookup — including other members' cards.
 document.addEventListener("error", e => {
  const img = e.target;
- if (!img || img.tagName !== "IMG" || !img.classList.contains("cover")) return;
- const poster = img.parentElement; img.remove();
+ if (!img || img.tagName !== "IMG") return;
+ const holder = img.parentElement;
+ if (img.closest(".kx-char-poster")) {
+  img.remove();
+  const name = holder && holder.dataset.kxName;
+  if (img.dataset.kxPosterFallback) {
+   if (name) { const cache=getJSON("kiroku_char_poster_cache",{}); delete cache[name]; setJSON("kiroku_char_poster_cache",cache); }
+   return;
+  }
+  if (name && !(holder && holder.dataset.kxPublic)) kxQueueCharPoster(name, holder);
+  return;
+ }
+ if (!img.classList.contains("cover")) return;
+ img.remove();
  if (img.dataset.fallback) return;
- const item = state.anime.concat(starterAnime).find(a => a.id === img.dataset.id);
- if (item && poster) attachPoster(poster, item);
+ const id = img.dataset.id;
+ const item = state.anime.concat(starterAnime, state.friendLists.flatMap(f => f.anime)).find(a => a.id === id);
+ if (item && holder) attachPoster(holder, item);
 }, true);
 
 /* ---------------- Card actions ---------------- */
 // Copies a card from the showcase into the signed-in user's own list.
-function adoptCard(id){
+async function adoptCard(id){
  if (!state.user) return;
- const src = starterAnime.find(a => a.id === id); if (!src) return;
+ const src = starterAnime.find(a => a.id === id) || state.friendLists.flatMap(f=>f.anime).find(a=>a.id===id); if (!src) return;
  if (state.anime.some(a => String(a.title).toLowerCase() === src.title.toLowerCase())) { showToast("Already in your list."); return; }
- state.anime.push(Object.assign({}, src, {id:"user-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), tag:"FROM SHOWCASE", favorite:false}));
- if (saveList()) showToast(src.title + " added — it's #" + state.anime.length + " in your list.");
+ const added = Object.assign({}, src, {id:"user-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), tag:"FROM SHOWCASE", favorite:false});
+ state.anime.push(added);
+ if (await saveList()) showToast(src.title + " added — it's #" + state.anime.length + " in your list.");
+ else state.anime = state.anime.filter(a => a !== added);
  renderAll();
 }
 
@@ -970,7 +1263,7 @@ function moveCard(id, dir){
   before.set(key, card.getBoundingClientRect());
  });
  [state.anime[i], state.anime[j]] = [state.anime[j], state.anime[i]];
- saveList(); renderAll();
+ void saveList(); renderAll();
  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
  document.querySelectorAll(".tier-list .tier[data-id]").forEach(card => {
   const key = (card.closest(".tier-list").id || "") + "::" + card.dataset.id;
@@ -987,13 +1280,13 @@ function moveCard(id, dir){
 }
 function toggleFavorite(id){
  const it = state.anime.find(a => a.id === id); if (!it) return;
- it.favorite = !it.favorite; saveList(); renderAll();
+ it.favorite = !it.favorite; void saveList(); renderAll();
 }
 function deleteCard(id){
  const it = state.anime.find(a => a.id === id);
  if (!it || !confirm("Remove " + it.title + " from your ranking?")) return;
  state.anime = state.anime.filter(a => a.id !== id);
- saveList(); renderAll(); showToast("Card removed.");
+ void saveList(); renderAll(); showToast("Card removed.");
 }
 
 function openCardEditor(id){
@@ -1004,6 +1297,7 @@ function openCardEditor(id){
  $("cardTitle").value = it ? it.title : "";
  $("cardNote").value = it ? it.note : "";
  $("cardTag").value = it ? it.tag : "";
+ $("cardStatus").value = it ? (it.status || "plan_to_watch") : "plan_to_watch";
  const uploaded = it && /^data:/i.test(it.image || "");
  $("cardImage").value = it && !uploaded ? (it.image || "") : "";
  $("cardFile").value = "";
@@ -1011,23 +1305,37 @@ function openCardEditor(id){
  openModal("cardModal");
 }
 
-// Shrinks uploads so they fit comfortably in browser storage.
-function readImage(file, cb){
- const reader = new FileReader();
- reader.onerror = () => cb(null);
- reader.onload = () => {
-  const img = new Image();
-  img.onload = () => {
-   const scale = Math.min(1, 480 / Math.max(img.width, img.height));
-   const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(img.width*scale)); c.height = Math.max(1, Math.round(img.height*scale));
-   const ctx = c.getContext("2d"); ctx.fillStyle = "#120b20"; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(img,0,0,c.width,c.height);
-   cb(c.toDataURL("image/jpeg", .84));
-  };
-  img.onerror = () => cb(null);
-  img.src = reader.result;
- };
- reader.readAsDataURL(file);
+// Shrinks uploads so they fit comfortably in storage. Works with phone-gallery photos too.
+async function kxLoadBitmap(file){
+ if (window.createImageBitmap) {
+  try { return await createImageBitmap(file, {imageOrientation:"from-image"}); } catch(e) {}
+  try { return await createImageBitmap(file); } catch(e) {}
+ }
+ return await new Promise((resolve, reject) => {
+  const url = URL.createObjectURL(file), img = new Image();
+  img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+  img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("decode")); };
+  img.src = url;
+ });
 }
+async function readImage(file, cb, maxSide){
+ try {
+  if (!file) throw new Error("nofile");
+  const src = await kxLoadBitmap(file);
+  const w = src.width || src.naturalWidth, h = src.height || src.naturalHeight;
+  if (!w || !h) throw new Error("empty");
+  const scale = Math.min(1, (maxSide || 420) / Math.max(w, h));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(w*scale)); c.height = Math.max(1, Math.round(h*scale));
+  const ctx = c.getContext("2d"); ctx.fillStyle = "#120b20"; ctx.fillRect(0,0,c.width,c.height); ctx.drawImage(src,0,0,c.width,c.height);
+  if (src.close) src.close();
+  cb(c.toDataURL("image/jpeg", .8));
+ } catch(e) {
+  console.warn("KIROKU image upload:", e);
+  cb(null);
+ }
+}
+const UPLOAD_FAIL = "Could not read that image (HEIC or a huge photo?). Please paste an image link instead.";
 
 function saveCard(event){
  event.preventDefault();
@@ -1036,24 +1344,25 @@ function saveCard(event){
  if (!title) return;
  const note = $("cardNote").value.trim();
  const tag = $("cardTag").value.trim() || "PERSONAL PICK";
+ const status = $("cardStatus").value || "plan_to_watch";
  const urlText = $("cardImage").value.trim();
  const file = $("cardFile").files[0];
  if (urlText && !cleanImg(urlText)) { showToast("The cover link must start with http:// or https://"); return; }
  if (file && file.size > 8 * 1024 * 1024) { showToast("That image is too large (max 8 MB)."); return; }
 
- const finish = uploaded => {
+ const finish = async uploaded => {
   const existing = editId ? state.anime.find(a => a.id === editId) : null;
   let image = uploaded || cleanImg(urlText);
   if (!image && existing && /^data:/i.test(existing.image || "")) image = existing.image;
   if (existing) {
-   existing.title = title; existing.search = title; existing.note = note; existing.tag = tag; existing.image = image;
+   existing.title = title; existing.search = title; existing.note = note; existing.tag = tag; existing.image = image; existing.status = status;
   } else {
-   state.anime.push({id:"user-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), title, search:title, note, tag, image, favorite:false});
+   state.anime.push({id:"user-" + Date.now() + "-" + Math.random().toString(36).slice(2,6), title, search:title, note, tag, image, favorite:false, status});
   }
-  if (saveList()) { showToast(existing ? "Gem updated." : "Gem added to your ranking."); closeModal("cardModal"); }
+  if (await saveList()) { showToast(existing ? "Gem updated." : "Gem added to your ranking."); closeModal("cardModal"); }
   renderAll();
  };
- if (file) readImage(file, data => { if (!data) showToast("Could not read that image."); else finish(data); });
+ if (file) readImage(file, data => { if (!data) showToast(UPLOAD_FAIL); else finish(data); });
  else finish("");
 }
 
@@ -1072,10 +1381,11 @@ function importList(event){
  const file = event.target.files[0]; event.target.value = "";
  if (!file) return;
  const reader = new FileReader();
- reader.onload = () => {
+ reader.onload = async () => {
   try {
    const text = String(reader.result).replace(/^\uFEFF/, "");              // strip BOM
    let data = JSON.parse(text);
+   const importedExtras = data && !Array.isArray(data) ? (data.extras || (data.tiers ? {tiers:data.tiers,stats:data.stats||{},trophies:data.trophies||{}} : null)) : null;
    if (data && !Array.isArray(data)) data = data.anime || data.list || data.items;   // new wrapped format
    if (!Array.isArray(data)) throw new Error("Not a list");
    data = data.filter(it => it && typeof it === "object");
@@ -1085,11 +1395,12 @@ function importList(event){
     let id = cleanId(it.id, "import-" + stamp + "-" + i);
     if (seen[id]) id = "import-" + stamp + "-" + i; seen[id] = true;
     return {id, title:String(it.title || "Untitled").slice(0,80), search:String(it.search || it.title || "").slice(0,120),
-     note:String(it.note || "").slice(0,220), tag:String(it.tag || "IMPORTED").slice(0,35), image:cleanImg(it.image), favorite:it.favorite === true || it.favorite === "true"};
+     note:String(it.note || "").slice(0,220), tag:String(it.tag || "IMPORTED").slice(0,35), image:cleanImg(it.image), favorite:it.favorite === true || it.favorite === "true", status:["watching","completed","plan_to_watch","dropped","on_hold"].includes(it.status)?it.status:"plan_to_watch"};
    });
    if (state.anime.length && !confirm("Replace your current list of " + state.anime.length + " with " + next.length + " imported gems?")) return;
    const old = state.anime; state.anime = next;
-   if (!saveList()) { state.anime = old; return; }                      // storage full: keep the old list
+   if (!await saveList()) { state.anime = old; renderAll(); return; }                      // keep the old list if the cloud write failed
+   if(importedExtras){kxData=kxNorm(importedExtras);kxSaveExtraData(true);}
    renderAll(); showToast(next.length + " gems imported.");
   } catch(e) { showToast("That JSON file does not look like a KIROKU list."); }
  };
@@ -1159,39 +1470,84 @@ function loadFigure(){
 }
 
 /* ---------------- Modals ---------------- */
-function openModal(id){ $(id).classList.add("open"); icons(); }
-function closeModal(id){ $(id).classList.remove("open"); }
-function closeAllModals(){ document.querySelectorAll(".modal-backdrop.open").forEach(m => m.classList.remove("open")); }
+function openModal(id){
+ const m=$(id);m.classList.add("open");icons();
+ const first=m.querySelector("input:not([type=hidden]):not([disabled]),textarea,button:not([data-close])");
+ if(first)setTimeout(()=>first.focus(),40);
+}
+function closeModal(id){ const m=$(id);if(m)closeModalNode(m); }
+function closeModalNode(m){
+ const url=m.dataset&&m.dataset.objectUrl;
+ if(url){URL.revokeObjectURL(url);m.dataset.objectUrl="";}
+ m.classList.remove("open");
+}
+function closeAllModals(){ document.querySelectorAll(".modal-backdrop.open").forEach(closeModalNode); }
+
+const SHARE_BUTTONS={share_anime:"shareAnimeSwitch",share_tiers:"shareTiersSwitch",share_trophies:"shareTrophiesSwitch"};
+function syncSharingUI(){
+ const sh=(state.user&&state.user.sharing)||DEFAULT_SHARING;
+ Object.keys(SHARE_BUTTONS).forEach(k=>{const b=$(SHARE_BUTTONS[k]);if(b)b.setAttribute("aria-checked",sh[k]!==false?"true":"false");});
+ const status=$("shareStatus");
+ if(status){
+  const open=SHARE_KEYS.filter(k=>sh[k]!==false).length;
+  status.textContent=open===SHARE_KEYS.length?"Everything is shared with other members.":open===0?"Everything is private — only you can see it.":"Some parts are private. Changes sync with your account.";
+ }
+}
+async function toggleSharing(key){
+ if(!state.user||!SHARE_KEYS.includes(key)){showToast("Log in first.");return;}
+ const button=$(SHARE_BUTTONS[key]);if(button)button.disabled=true;
+ const next=!(state.user.sharing[key]!==false);
+ const payload={};SHARE_KEYS.forEach(k=>payload[k]=state.user.sharing[k]!==false);payload[key]=next;
+ try{
+  const {error}=await db.rpc("kiroku_set_sharing",payload);
+  if(error)throw error;
+  state.user.sharing=payload;
+  syncSharingUI();
+  await refreshFriendLists();
+  showToast((key==="share_anime"?"Anime ranking":key==="share_tiers"?"Character boards":"Achievements")+(next?" are now shared.":" are now private."));
+ }catch(error){
+  console.warn("KIROKU sharing:",error);
+  showToast("Could not save sharing settings. Run the latest KIROKU SQL migration.");
+ }finally{if(button)button.disabled=false;}
+}
 
 function openCreateUser(){
- if (!state.user || !state.user.premium) { showToast("Creating accounts is a premium feature."); return; }
- $("newUsername").value = ""; $("newPassword").value = ""; openModal("createUserModal");
+ $("newUsername").value="";$("newEmail").value="";$("newPassword").value="";
+ openModal("createUserModal");
 }
-function createUserSubmit(event){
+const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v||"").trim());
+async function createUserSubmit(event){
  event.preventDefault();
- if (!state.user || !state.user.premium) { showToast("Premium membership is required."); return; }
- const username = $("newUsername").value.trim(), password = $("newPassword").value;
- if (!/^[a-zA-Z0-9_]{3,28}$/.test(username)) { showToast("Use 3–28 letters, numbers, or underscores."); return; }
- if (password.length < 8) { showToast("Password must be at least 8 characters."); return; }
- const users = getUsers();
- if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) { showToast("That username is already taken."); return; }
- hashPassword(username, password).then(hash => {
-  users.push({username, hash, role:"member", premium:true, icon:"user-round"});
-  setJSON("kiroku_users", users); closeModal("createUserModal");
-  showToast("Premium account created. They can log in on this browser.");
- });
+ const username=$("newUsername").value.trim(),email=$("newEmail").value.trim(),password=$("newPassword").value,btn=$("registerButton");
+ if(!/^[a-zA-Z0-9_]{3,28}$/.test(username)){showToast("Use 3–28 letters, numbers, or underscores for your public username.");return;}
+ if(!isEmail(email)){showToast("Enter a valid email address.");return;}
+ if(password.length<8){showToast("Password must be at least 8 characters.");return;}
+ btn.disabled=true;
+ try{
+  const {data,error}=await db.auth.signUp({email:email,password:password,options:{data:{username:username.toLowerCase(),display_name:username}}});
+  if(error)throw error;
+  closeModal("createUserModal");
+  if(!data.session){showToast("Account created. Open the confirmation link in your inbox to enter KIROKU.");return;}
+  await loadAccount(data.session,true);
+  showToast("Welcome to KIROKU, "+username+"!");
+ }catch(error){
+  console.warn("KIROKU signup:",error);
+  const message=String(error&&error.message||"");
+  showToast(/already|registered|unique|duplicate/i.test(message)?"That email is already registered.":"Could not create the account. Check the details and try again.");
+ }finally{btn.disabled=false;}
 }
-
-function loginSubmit(event){
+async function loginSubmit(event){
  event.preventDefault();
- const username = $("gateUsername").value.trim(), password = $("gatePassword").value, btn = $("loginButton");
- btn.disabled = true;
- hashPassword(username, password).then(hash => {
-  const user = getUsers().find(u => u.username.toLowerCase() === username.toLowerCase() && u.hash === hash);
-  if (!user) { showToast("Wrong username or password."); return; }
-  rawSet("kiroku_session", user.username); $("gatePassword").value = "";
-  loadAccount(); showWelcome(user);
- }).catch(() => showToast("Login is unavailable in this browser.")).then(() => { btn.disabled = false; });
+ const email=$("gateEmail").value.trim(),password=$("gatePassword").value,btn=$("loginButton");
+ if(!isEmail(email)){showToast("Enter your email address.");return;}
+ btn.disabled=true;
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email:email,password:password});
+  if(error)throw error;
+  $("gatePassword").value="";
+  await loadAccount(data.session,true);
+ }catch(error){console.warn("KIROKU sign-in:",error);showToast("Wrong email or password.");}
+ finally{btn.disabled=false;}
 }
 
 /* ---------------- Wiring ---------------- */
@@ -1219,6 +1575,9 @@ document.addEventListener("click", e => {
   case "import-json": $("jsonImport").click(); break;
   case "logout": logout(); break;
   case "lite": setLite(!isLite()); break;
+  case "share-anime": toggleSharing("share_anime"); break;
+  case "share-tiers": toggleSharing("share_tiers"); break;
+  case "share-trophies": toggleSharing("share_trophies"); break;
   case "create-user": openCreateUser(); break;
   case "premium": openModal("premiumModal"); break;
   case "telegram": window.open(TELEGRAM, "_blank", "noopener,noreferrer"); break;
@@ -1229,6 +1588,12 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeAllModa
 
 $("loginForm").addEventListener("submit", loginSubmit);
 $("createUserForm").addEventListener("submit", createUserSubmit);
+$("openRegister").addEventListener("click", openCreateUser);
+$("friendSelect").addEventListener("change", renderFriendArchive);
+$("friendStatusFilter").addEventListener("change", renderFriendArchive);
+$("friendFavoritesOnly").addEventListener("change", renderFriendArchive);
+$("communitySelect").addEventListener("change", () => renderCommunityBoard());
+$("communityRefresh").addEventListener("click", async () => { await refreshFriendLists(); showToast("Community boards refreshed."); });
 $("cardForm").addEventListener("submit", saveCard);
 $("jsonImport").addEventListener("change", importList);
 $("userButton").addEventListener("click", () => {
@@ -1277,6 +1642,296 @@ window.addEventListener("pointermove", e => {
  stage.addEventListener("click", () => { stage.classList.add("projecting"); setTimeout(() => stage.classList.remove("projecting"), 1500); });
 })();
 
+
+/* ============================================================
+   KIROKU LAB — Original's character boards and play tools,
+   rebuilt in the existing Midnight / Sakura / Forest / Ember UI.
+   Private data is stored per account in Supabase (RLS protected).
+   ============================================================ */
+const KX_TIERS=["S","A","B","C","D"];
+const KX_DEFAULT_TIERS={active:"kx-villains",topics:[
+ {id:"kx-villains",name:"Best villains",seed:true,chars:[
+  {id:"kx-c1",name:"Ryomen Sukuna",from:"Jujutsu Kaisen",image:"",tier:"S"},
+  {id:"kx-c2",name:"Makima",from:"Chainsaw Man",image:"",tier:"S"},
+  {id:"kx-c3",name:"Hisoka Morow",from:"Hunter × Hunter",image:"",tier:"A"},
+  {id:"kx-c4",name:"Meruem",from:"Hunter × Hunter",image:"",tier:"A"},
+  {id:"kx-c5",name:"Naoya Zenin",from:"Jujutsu Kaisen",image:"",tier:"B"},
+  {id:"kx-c6",name:"Muzan Kibutsuji",from:"Demon Slayer",image:"",tier:""}]},
+ {id:"kx-heroes",name:"Best heroes",seed:true,chars:[
+  {id:"kx-c7",name:"Rudeus Greyrat",from:"Mushoku Tensei",image:"",tier:"S"},
+  {id:"kx-c8",name:"Cid Kagenou",from:"The Eminence in Shadow",image:"",tier:"S"},
+  {id:"kx-c9",name:"Satoru Gojo",from:"Jujutsu Kaisen",image:"",tier:"A"},
+  {id:"kx-c10",name:"Killua Zoldyck",from:"Hunter × Hunter",image:"",tier:"A"},
+  {id:"kx-c11",name:"Subaru Natsuki",from:"Re:Zero",image:"",tier:"B"},
+  {id:"kx-c12",name:"Kazuma Satou",from:"KONOSUBA",image:"",tier:"C"},
+  {id:"kx-c13",name:"Denji",from:"Chainsaw Man",image:"",tier:""}]}
+]};
+const KX_TROPHIES=[
+ {id:"collect",icon:"library",name:"Collector",hint:"Reach 20 anime titles",ok:()=>state.anime.length>=20},
+ {id:"love",icon:"heart",name:"Devoted",hint:"Favourite 3 anime titles",ok:()=>state.anime.filter(a=>a.favorite).length>=3},
+ {id:"judge",icon:"scale",name:"Judge",hint:"Move 5 characters between tiers",ok:()=>kxData.stats.moves>=5},
+ {id:"curate",icon:"layers",name:"Curator",hint:"Create your own character topic",ok:()=>kxData.tiers.topics.some(t=>!t.seed)},
+ {id:"duel",icon:"swords",name:"Gladiator",hint:"Play 10 anime duels",ok:()=>kxData.stats.duels>=10},
+ {id:"luck",icon:"clover",name:"Fate",hint:"Use the random roll",ok:()=>kxData.stats.rolls>=1},
+ {id:"share",icon:"image",name:"Broadcaster",hint:"Export an image card",ok:()=>kxData.stats.shares>=1},
+ {id:"egg",icon:"zap",name:"24 FPS",hint:"Find the hidden Projection Sorcery secret",ok:()=>kxData.stats.egg>=1},
+ {id:"both",icon:"palette",name:"Both sides",hint:"Try two different themes",ok:()=>kxData.stats.themes>=2}
+];
+let kxData={tiers:structuredClone(KX_DEFAULT_TIERS),stats:{moves:0,duels:0,rolls:0,shares:0,egg:0,themes:0},trophies:{}};
+let kxPickedChar="";
+let kxSaveQueue=Promise.resolve(),kxSaving=false,kxDataReady=false,kxRealtime=null,kxTopicEdit="",kxCharEdit="",kxDuel=null,kxRollTimer=0,kxImageBlob=null,kxImageName="kiroku";
+let kxMissingTableWarned=false;
+const kxId=()=>"kx-"+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function kxNorm(raw){
+ const out={tiers:{active:"",topics:[]},stats:{moves:0,duels:0,rolls:0,shares:0,egg:0,themes:0},trophies:{}};
+ const t=raw&&raw.tiers&&Array.isArray(raw.tiers.topics)?raw.tiers:KX_DEFAULT_TIERS;
+ t.topics.slice(0,24).forEach((topic,i)=>{if(!topic||typeof topic!=="object")return;const seen=new Set();const chars=(Array.isArray(topic.chars)?topic.chars:[]).slice(0,120).filter(Boolean).map((c,j)=>{let id=cleanId(c.id,"kx-"+i+"-"+j);if(seen.has(id))id=id+"-"+j;seen.add(id);return{id,name:String(c.name||"Unknown").slice(0,60),from:String(c.from||"").slice(0,60),image:cleanImg(c.image),tier:KX_TIERS.includes(c.tier)?c.tier:""};});out.tiers.topics.push({id:cleanId(topic.id,"kx-topic-"+i),name:String(topic.name||"Topic").slice(0,40),seed:topic.seed===true,chars});});
+ out.tiers.active=out.tiers.topics.some(x=>x.id===t.active)?t.active:(out.tiers.topics[0]?.id||"");
+ const s=raw&&raw.stats&&typeof raw.stats==="object"?raw.stats:{};Object.keys(out.stats).forEach(k=>out.stats[k]=Math.max(0,Number(s[k])||0));
+ out.trophies=raw&&raw.trophies&&typeof raw.trophies==="object"?raw.trophies:{};
+ return out;
+}
+function kxResetExtraData(){kxData=kxNorm({tiers:KX_DEFAULT_TIERS});kxDataReady=false;if(kxRealtime){db.removeChannel(kxRealtime);kxRealtime=null;}}
+async function kxLoadExtraData(){
+ if(!state.user)return;
+ const backup=rawGet("kiroku_extra_"+state.user.username.toLowerCase());
+ try{
+  const {data,error}=await db.from("user_kiroku_data").select("tiers,stats,trophies").eq("user_id",state.user.id).maybeSingle();
+  if(error)throw error;
+  if(data)kxData=kxNorm(data);else if(backup){try{kxData=kxNorm(JSON.parse(backup));}catch(e){kxData=kxNorm(null);}}
+  else kxData=kxNorm(null);
+  kxDataReady=true;
+  if(!data)await kxSaveExtraData(true);
+  if(kxRealtime)await db.removeChannel(kxRealtime);
+  kxRealtime=db.channel("kiroku-private-lab-"+state.user.id).on("postgres_changes",{event:"*",schema:"public",table:"user_kiroku_data",filter:"user_id=eq."+state.user.id},async()=>{if(!kxSaving){const {data,error}=await db.from("user_kiroku_data").select("tiers,stats,trophies").eq("user_id",state.user.id).maybeSingle();if(!error&&data){kxData=kxNorm(data);rawSet("kiroku_extra_"+state.user.username.toLowerCase(),JSON.stringify(kxData));kxRenderAll();}}}).subscribe();
+ }catch(error){
+  console.warn("KIROKU private lab data:",error);
+  try{kxData=backup?kxNorm(JSON.parse(backup)):kxNorm(null);}catch(e){kxData=kxNorm(null);}
+  kxDataReady=true;
+  if(!kxMissingTableWarned){kxMissingTableWarned=true;showToast("Run the KIROKU Lab SQL migration to sync character boards and trophies.");}
+ }
+ kxRenderAll();
+}
+async function kxSaveExtraData(silent){
+ if(!state.user||!kxDataReady)return;
+ const owner=state.user.id,username=state.user.username.toLowerCase(),snapshot=JSON.parse(JSON.stringify(kxData));
+ rawSet("kiroku_extra_"+username,JSON.stringify(snapshot));
+ kxSaveQueue=kxSaveQueue.then(async()=>{kxSaving=true;const {error}=await db.from("user_kiroku_data").upsert({user_id:owner,tiers:snapshot.tiers,stats:snapshot.stats,trophies:snapshot.trophies,updated_at:new Date().toISOString()},{onConflict:"user_id"});if(error)throw error;}).catch(error=>{console.warn("KIROKU lab sync:",error);if(!silent)showToast("Lab sync failed. Your local backup is safe.");}).finally(()=>{kxSaving=false;});
+ return kxSaveQueue;
+}
+function kxCheckTrophies(silent){
+ const fresh=[];KX_TROPHIES.forEach(t=>{if(!kxData.trophies[t.id]&&t.ok()){kxData.trophies[t.id]=Date.now();fresh.push(t);}});
+ if(fresh.length){kxSaveExtraData(true);kxRenderTrophies();if(!silent)showToast("Achievement unlocked: "+fresh[0].name+" ✦");}
+}
+function kxBump(key){kxData.stats[key]=(kxData.stats[key]||0)+1;kxCheckTrophies();kxSaveExtraData(true);kxRenderStats();}
+function kxRenderStats(){
+ const el=$("kxStats");if(!el)return;
+ const chars=kxData.tiers.topics.reduce((n,t)=>n+t.chars.length,0);
+ const rows=[[state.anime.length,"Anime"],[state.anime.filter(a=>a.favorite).length,"Favourites"],[chars,"Characters"],[kxData.stats.duels||0,"Duels"]];
+ el.innerHTML=rows.map(([n,l])=>`<div class="kx-stat"><b>${n}</b><small>${l}</small></div>`).join("");
+}
+function kxRenderTrophies(){
+ const el=$("kxTrophies");if(!el)return;
+ el.innerHTML=KX_TROPHIES.map(t=>`<div class="kx-trophy ${kxData.trophies[t.id]?"unlocked":""}"><span class="kx-trophy-icon"><i data-lucide="${t.icon}"></i></span><b>${t.name}</b><small>${t.hint}</small></div>`).join("");
+ $("kxTrophyCount").textContent=KX_TROPHIES.filter(t=>kxData.trophies[t.id]).length+" / "+KX_TROPHIES.length+" unlocked";icons();
+}
+function kxTopic(){return kxData.tiers.topics.find(t=>t.id===kxData.tiers.active)||null;}
+function kxFindChar(id){for(const t of kxData.tiers.topics){const c=t.chars.find(x=>x.id===id);if(c)return c;}return null;}
+
+// Character portraits use AniList's Character search first, then Jikan's character endpoint.
+// Requests are deduplicated and cached locally so rendering a board does not spam either API.
+const kxCharPosterInflight=new Map(),kxCharPosterQueue=[];let kxCharPosterBusy=false;
+function kxQueueCharPoster(name,element){const key=String(name||"").trim();if(!key||!element)return;const cache=getJSON("kiroku_char_poster_cache",{});if(cache[key]){kxAttachCharPoster(element,cache[key]);return;}if(kxCharPosterInflight.has(key)){kxCharPosterInflight.get(key).push(element);return;}kxCharPosterInflight.set(key,[element]);kxCharPosterQueue.push(key);kxPumpCharPosters();}
+function kxAttachCharPoster(element,url){if(!document.body.contains(element)||element.querySelector("img"))return;const im=new Image();im.alt="";im.loading="lazy";im.referrerPolicy="no-referrer";im.dataset.kxPosterFallback="1";im.src=url;element.appendChild(im);}
+async function kxAniListCharacter(query){
+ try{
+  const r=await fetch("https://graphql.anilist.co",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({query:"query ($search: String) { Character(search: $search) { image { large } } }",variables:{search:query}})});
+  if(!r.ok)return "";
+  const j=await r.json();return j?.data?.Character?.image?.large||"";
+ }catch(e){return "";}
+}
+async function kxJikanCharacter(query){
+ try{
+  const r=await fetch("https://api.jikan.moe/v4/characters?q="+encodeURIComponent(query)+"&limit=5");
+  if(!r.ok)return "";
+  const j=await r.json(),list=j?.data||[],wanted=String(query||"").toLowerCase();
+  const match=list.find(x=>String(x.name||"").toLowerCase()===wanted)||list.find(x=>String(x.name||"").toLowerCase().includes(wanted))||list[0];
+  const im=match?.images;return im?.webp?.image_url||im?.jpg?.image_url||"";
+ }catch(e){return "";}
+}
+async function kxLookupCharPoster(name){
+ const clean=String(name||"").trim();if(!clean)return "";
+ let url=await kxAniListCharacter(clean);if(url)return url;
+ url=await kxJikanCharacter(clean);if(url)return url;
+ // Last resort for villains/aliases that the exact search does not find.
+ const alt=/\b(villain|antagonist)\b/i.test(clean)?clean:clean+" villain";
+ url=await kxAniListCharacter(alt);if(url)return url;
+ return kxJikanCharacter(alt);
+}
+async function kxPumpCharPosters(){if(kxCharPosterBusy)return;kxCharPosterBusy=true;while(kxCharPosterQueue.length){const key=kxCharPosterQueue.shift();let url="";try{url=await kxLookupCharPoster(key);}catch(e){}if(url){const cache=getJSON("kiroku_char_poster_cache",{});cache[key]=url;setJSON("kiroku_char_poster_cache",cache);}const targets=kxCharPosterInflight.get(key)||[];kxCharPosterInflight.delete(key);let kxDirty=false;targets.forEach(el=>{if(!url)return;kxAttachCharPoster(el,url);const id=el.dataset&&el.dataset.kxPoster;if(!id||!/^https:\/\//i.test(url))return;kxData.tiers.topics.forEach(tp=>tp.chars.forEach(ch=>{if(ch.id===id&&!cleanImg(ch.image)){ch.image=url;kxDirty=true;}}));});if(kxDirty)kxSaveExtraData(true);await new Promise(r=>setTimeout(r,450));}kxCharPosterBusy=false;}
+
+function kxRenderTiers(){
+ const tabs=$("kxTopics"),board=$("kxTierBoard"),topic=kxTopic();if(!tabs||!board)return;
+ kxPickedChar="";
+ tabs.innerHTML=kxData.tiers.topics.map(t=>`<button class="kx-topic ${t.id===kxData.tiers.active?"active":""}" type="button" data-kx-topic="${esc(t.id)}">${esc(t.name)}</button>`).join("");
+ if(!topic){$("kxTopicName").textContent="No topics yet";$("kxTopicCount").textContent="Create a topic to begin";board.innerHTML='<div class="kx-empty">Your character universe starts here. Create a topic and add your first character.</div>';return;}
+ $("kxTopicName").textContent=topic.name;$("kxTopicCount").textContent=topic.chars.length+" characters";
+ const chip=c=>`<button class="kx-char" type="button" draggable="true" data-kx-char="${esc(c.id)}"><span class="kx-char-poster" data-kx-poster="${esc(c.id)}" data-kx-name="${esc(c.name)}"><span>${esc(Array.from(c.name)[0]||"?")}</span>${cleanImg(c.image)?`<img src="${esc(c.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">`:""}</span><b>${esc(c.name)}</b><small>${esc(c.from||"Character")}</small></button>`;
+ board.innerHTML=KX_TIERS.map((tier,i)=>`<div class="kx-tier-row"><div class="kx-tier-label tier-${tier.toLowerCase()}"><b>${tier}</b></div><div class="kx-tier-drop" data-kx-drop="${tier}">${topic.chars.filter(c=>c.tier===tier).map(chip).join("")||'<span class="kx-tier-empty">Drop characters here</span>'}</div></div>`).join("")+`<div class="kx-tier-row kx-unranked"><div class="kx-tier-label"><b>—</b></div><div class="kx-tier-drop" data-kx-drop="">${topic.chars.filter(c=>!c.tier).map(chip).join("")||'<span class="kx-tier-empty">Unranked characters appear here</span>'}</div></div>`;
+ topic.chars.forEach(c=>{if(cleanImg(c.image))return;const el=board.querySelector(`[data-kx-poster="${CSS.escape(c.id)}"]`);if(el)kxQueueCharPoster(c.name,el);});
+}
+function kxRenderAll(){kxCheckTrophies(true);kxRenderTiers();kxRenderStats();kxRenderTrophies();}
+function kxSaveTiers(){kxCheckTrophies(true);kxSaveExtraData(true);kxRenderAll();}
+function kxMoveChar(id,tier){const t=kxTopic(),c=t&&t.chars.find(x=>x.id===id);if(!c||c.tier===tier)return;c.tier=tier;kxData.stats.moves=(kxData.stats.moves||0)+1;kxSaveTiers();}
+function kxOpenTopic(id){kxTopicEdit=id||"";const t=id?kxData.tiers.topics.find(x=>x.id===id):null;$("kxTopicModalTitle").textContent=t?"Edit topic":"New topic";$("kxTopicInput").value=t?t.name:"";$("kxDeleteTopic").style.display=t?"inline-flex":"none";openModal("kxTopicModal");}
+$("kxTopicForm").addEventListener("submit",e=>{e.preventDefault();const name=$("kxTopicInput").value.trim().slice(0,40);if(!name)return;if(kxTopicEdit){const t=kxData.tiers.topics.find(x=>x.id===kxTopicEdit);if(t)t.name=name;}else{if(kxData.tiers.topics.length>=24){showToast("You have reached the 24-topic limit.");return;}const t={id:kxId(),name,seed:false,chars:[]};kxData.tiers.topics.push(t);kxData.tiers.active=t.id;}closeModal("kxTopicModal");kxSaveTiers();showToast("Topic saved.");});
+$("kxTopicSuggestions").addEventListener("click",e=>{const b=e.target.closest("[data-kx-suggestion]");if(b){$("kxTopicInput").value=b.dataset.kxSuggestion;$("kxTopicInput").focus();}});
+$("kxDeleteTopic").addEventListener("click",()=>{const t=kxData.tiers.topics.find(x=>x.id===kxTopicEdit);if(!t||!confirm("Delete “"+t.name+"” and all its characters?"))return;kxData.tiers.topics=kxData.tiers.topics.filter(x=>x!==t);kxData.tiers.active=kxData.tiers.topics[0]?.id||"";closeModal("kxTopicModal");kxSaveTiers();});
+function kxOpenChar(id){const t=kxTopic();if(!t){showToast("Create a topic first.");return;}const c=id?t.chars.find(x=>x.id===id):null;kxCharEdit=c?c.id:"";$("kxCharModalTitle").textContent=c?"Edit character":"Add character";$("kxCharName").value=c?c.name:"";$("kxCharFrom").value=c?c.from:"";$("kxCharTier").value=c?c.tier:"";$("kxCharImage").value=c&&!/^data:/i.test(c.image||"")?c.image:"";$("kxCharFile").value="";$("kxDeleteChar").style.display=c?"inline-flex":"none";openModal("kxCharModal");}
+function kxReadImage(file,cb){readImage(file,cb,360);}
+$("kxCharForm").addEventListener("submit",e=>{e.preventDefault();const t=kxTopic();if(!t)return;const name=$("kxCharName").value.trim(),from=$("kxCharFrom").value.trim(),tier=$("kxCharTier").value,url=cleanImg($("kxCharImage").value),file=$("kxCharFile").files[0];if(!name)return;if($("kxCharImage").value.trim()&&!url){showToast("Use a valid http(s) portrait URL.");return;}const finish=img=>{let c=kxCharEdit?t.chars.find(x=>x.id===kxCharEdit):null;if(c)Object.assign(c,{name,from,tier,image:img||url||c.image});else{if(t.chars.length>=120){showToast("A topic can contain up to 120 characters.");return;}t.chars.push({id:kxId(),name,from,tier,image:img||url});}closeModal("kxCharModal");kxSaveTiers();};if(file){if(file.size>8*1024*1024){showToast("Image must be smaller than 8 MB.");return;}kxReadImage(file,d=>d?finish(d):showToast(UPLOAD_FAIL));}else finish("");});
+$("kxDeleteChar").addEventListener("click",()=>{const t=kxTopic();if(!t)return;const c=t.chars.find(x=>x.id===kxCharEdit);if(!c||!confirm("Remove "+c.name+" from this topic?"))return;t.chars=t.chars.filter(x=>x!==c);closeModal("kxCharModal");kxSaveTiers();});
+const kxTouchLayout=()=>!!(window.matchMedia&&window.matchMedia("(hover: none), (pointer: coarse)").matches);
+function kxSetPickedChar(id){
+ kxPickedChar=(kxPickedChar===id)?"":id;
+ const board=$("kxTierBoard");
+ board.querySelectorAll("[data-kx-char]").forEach(el=>el.classList.toggle("picked",el.dataset.kxChar===kxPickedChar));
+ board.querySelectorAll("[data-kx-drop]").forEach(el=>el.classList.toggle("kx-drop-ready",!!kxPickedChar));
+ if(kxPickedChar&&!rawGet("kiroku_kx_tap_hint")){rawSet("kiroku_kx_tap_hint","1");showToast("Now tap a tier row to place the character.");}
+}
+$("kxTierBoard").addEventListener("click",e=>{
+ const drop=e.target.closest("[data-kx-drop]");
+ if(kxPickedChar&&drop){const id=kxPickedChar;kxSetPickedChar("");kxMoveChar(id,drop.dataset.kxDrop);return;}
+ const c=e.target.closest("[data-kx-char]");if(!c)return;
+ if(kxTouchLayout()){
+  if(kxPickedChar===c.dataset.kxChar){kxSetPickedChar("");kxOpenChar(c.dataset.kxChar);}
+  else kxSetPickedChar(c.dataset.kxChar);
+  return;
+ }
+ kxOpenChar(c.dataset.kxChar);
+});
+let kxDrag="";$("kxTierBoard").addEventListener("dragstart",e=>{const c=e.target.closest("[data-kx-char]");if(!c)return;kxDrag=c.dataset.kxChar;c.classList.add("dragging");e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",kxDrag);});
+$("kxTierBoard").addEventListener("dragend",e=>{kxDrag="";$("kxTierBoard").querySelectorAll(".dragging,.drag-over").forEach(x=>x.classList.remove("dragging","drag-over"));});
+$("kxTierBoard").addEventListener("dragover",e=>{const z=e.target.closest("[data-kx-drop]");if(!z||!kxDrag)return;e.preventDefault();z.classList.add("drag-over");});
+$("kxTierBoard").addEventListener("dragleave",e=>{const z=e.target.closest("[data-kx-drop]");if(z&&!z.contains(e.relatedTarget))z.classList.remove("drag-over");});
+$("kxTierBoard").addEventListener("drop",e=>{const z=e.target.closest("[data-kx-drop]");if(!z||!kxDrag)return;e.preventDefault();const id=kxDrag,tier=z.dataset.kxDrop;kxDrag="";z.classList.remove("drag-over");kxMoveChar(id,tier);});
+$("kxTopics").addEventListener("click",e=>{const b=e.target.closest("[data-kx-topic]");if(!b)return;kxData.tiers.active=b.dataset.kxTopic;kxSaveExtraData(true);kxRenderTiers();});
+function kxOpenImage(blob,name){kxImageBlob=blob;kxImageName=name||"kiroku";const url=URL.createObjectURL(blob);$("kxPreviewImage").src=url;$("kxImageModal").dataset.objectUrl=url;openModal("kxImageModal");}
+$("kxDownloadImage").addEventListener("click",()=>{if(!kxImageBlob)return;const a=document.createElement("a");a.href=URL.createObjectURL(kxImageBlob);a.download=kxImageName+".png";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);kxBump("shares");showToast("Image saved.");});
+$("kxShareImage").addEventListener("click",async()=>{if(!kxImageBlob)return;if(!navigator.share||!window.File){showToast("Sharing is not available here. Use Save image instead.");return;}try{const file=new File([kxImageBlob],kxImageName+".png",{type:"image/png"});if(navigator.canShare&&!navigator.canShare({files:[file]})){showToast("This browser cannot share image files. Use Save image.");return;}await navigator.share({files:[file],title:"My KIROKU tierlist",text:"Made with KIROKU."});kxBump("shares");showToast("Image shared.");}catch(error){if(error&&error.name!=="AbortError")showToast("Could not share the image.");}});
+$("kxImageModal").addEventListener("click",e=>{if(e.target.classList.contains("modal-backdrop")||e.target.closest('[data-close="kxImageModal"]')){const u=e.currentTarget.dataset.objectUrl;if(u)URL.revokeObjectURL(u);e.currentTarget.dataset.objectUrl="";}});
+function kxThemePalette(){const cs=getComputedStyle(document.documentElement);const a=cs.getPropertyValue("--a").trim()||"#aeb9d0",b=cs.getPropertyValue("--b").trim()||"#e1e6f2",base=cs.getPropertyValue("--base2").trim()||"#0d1017",text=cs.getPropertyValue("--text").trim()||"#fff",mut=cs.getPropertyValue("--muted").trim()||"#aaa";return{a,b,base,text,mut};}
+function kxCanvasProxy(url){return /^https?:\/\//i.test(url)?"https://images.weserv.nl/?url="+encodeURIComponent(url.replace(/^https?:\/\//,""))+"&w=400&output=jpg":url;}
+function kxLoadCanvasImage(url){return new Promise(resolve=>{
+ if(!url)return resolve(null);
+ const proxy=kxCanvasProxy(url);let done=false;
+ const timer=setTimeout(()=>finish(null),9000);
+ const finish=value=>{if(done)return;done=true;clearTimeout(timer);resolve(value);};
+ const attempt=(src,fallback)=>{
+  const im=new Image();im.crossOrigin="anonymous";im.referrerPolicy="no-referrer";
+  im.onload=()=>finish(im);
+  im.onerror=()=>{if(!done&&fallback)attempt(fallback,null);else finish(null);};
+  im.src=src;
+ };
+ attempt(url,proxy!==url?proxy:null);
+});}
+function kxCanvasText(ctx,text,x,y,max,font,color){ctx.font=font;ctx.fillStyle=color;ctx.textAlign="left";let s=String(text||"");while(s.length>2&&ctx.measureText(s).width>max)s=s.slice(0,-2);ctx.fillText(s+(s.length<String(text||"").length?"…":""),x,y);}
+async function kxExportTop5(){if(!state.anime.length){showToast("Add anime to your list first.");return;}showToast("Preparing your Top 5 card…");const P=kxThemePalette(),items=state.anime.slice(0,5),W=1080,H=190+items.length*190+90,cv=document.createElement("canvas");cv.width=W;cv.height=H;const x=cv.getContext("2d");x.fillStyle=P.base;x.fillRect(0,0,W,H);x.fillStyle=P.a;x.fillRect(0,0,W,9);x.fillStyle=P.text;x.font="800 54px 'Space Grotesk',sans-serif";x.fillText("KIROKU",46,82);x.fillStyle=P.mut;x.font="600 22px 'DM Sans',sans-serif";x.fillText("MY TOP ANIME · "+(state.user?.username||"MEMBER"),48,124);const imgs=await Promise.all(items.map(a=>kxLoadCanvasImage(cleanImg(a.image)||getJSON("kiroku_poster_cache",{})[a.search||a.title]||"")));items.forEach((a,i)=>{const y=160+i*190;x.fillStyle=i===0?P.a:"rgba(255,255,255,.07)";x.globalAlpha=i===0?.2:1;x.fillRect(42,y,W-84,164);x.globalAlpha=1;const im=imgs[i];if(im){const s=Math.max(120/im.width,164/im.height),sw=120/s,sh=164/s;x.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,58,y,120,164);}else{x.fillStyle="rgba(255,255,255,.1)";x.fillRect(58,y,120,164);x.fillStyle=P.text;x.font="700 50px 'Space Grotesk',sans-serif";x.fillText(Array.from(a.title)[0]||"?",100,y+94);}x.fillStyle=P.text;x.font="800 38px 'Space Grotesk',sans-serif";kxCanvasText(x,(i+1)+". "+a.title,210,y+76,W-290,"800 38px 'Space Grotesk',sans-serif",P.text);x.fillStyle=P.mut;x.font="600 22px 'DM Sans',sans-serif";kxCanvasText(x,a.tag||"PERSONAL PICK",210,y+116,W-290,"600 22px 'DM Sans',sans-serif",P.mut);});x.fillStyle=P.mut;x.font="600 20px 'DM Sans',sans-serif";x.fillText("YOUR TASTE, YOUR RULES · KIROKU",46,H-34);cv.toBlob(blob=>{if(blob)kxOpenImage(blob,"kiroku-top5");else showToast("Could not create the image.");},"image/png");}
+async function kxExportTiers(){
+ const t=kxTopic();if(!t){showToast("Create a character topic first.");return;}
+ showToast("Preparing your tierlist image…");
+ const P=kxThemePalette(),W=1200,L=120,G=12,C=112,cols=7;
+ const tiers=KX_TIERS.concat("");                         // include the Unranked row
+ const rows=tiers.map(tier=>t.chars.filter(c=>(c.tier||"")===tier));
+ const heights=rows.map(r=>Math.max(1,Math.ceil(r.length/cols))*160+20);
+ const H=160+heights.reduce((a,b)=>a+b,0)+70;
+ const cv=document.createElement("canvas");cv.width=W;cv.height=H;
+ const x=cv.getContext("2d");
+ x.fillStyle=P.base;x.fillRect(0,0,W,H);x.fillStyle=P.a;x.fillRect(0,0,W,9);
+ x.fillStyle=P.text;x.font="800 48px 'Space Grotesk',sans-serif";x.fillText(t.name,36,80);
+ x.fillStyle=P.mut;x.font="600 20px 'DM Sans',sans-serif";x.fillText("CHARACTER TIERLIST · KIROKU",38,118);
+ let y=150;
+ for(let i=0;i<tiers.length;i++){
+  x.fillStyle="rgba(255,255,255,.07)";x.fillRect(30,y,W-60,heights[i]);
+  x.fillStyle=P.a;x.fillRect(30,y,L,heights[i]);x.fillStyle=P.base;
+  x.font=tiers[i]?"800 58px 'Space Grotesk',sans-serif":"800 42px 'Space Grotesk',sans-serif";
+  x.fillText(tiers[i]||"—",65,y+76);
+  const imgs=await Promise.all(rows[i].map(c=>kxLoadCanvasImage(cleanImg(c.image)||getJSON("kiroku_char_poster_cache",{})[c.name]||"")));
+  rows[i].forEach((c,j)=>{
+   const xx=170+(j%cols)*(C+G),yy=y+12+Math.floor(j/cols)*160,im=imgs[j];
+   if(im){const s=Math.max(C/im.width,C/im.height),sw=C/s,sh=C/s;x.drawImage(im,(im.width-sw)/2,(im.height-sh)/2,sw,sh,xx,yy,C,C);}
+   else{x.fillStyle="rgba(255,255,255,.12)";x.fillRect(xx,yy,C,C);x.fillStyle=P.text;x.font="700 42px 'Space Grotesk',sans-serif";x.fillText(Array.from(c.name)[0]||"?",xx+44,yy+68);}
+   x.fillStyle=P.text;kxCanvasText(x,c.name,xx,yy+128,C,"600 15px 'DM Sans',sans-serif",P.text);
+  });
+  y+=heights[i]+8;
+ }
+ x.fillStyle=P.mut;x.font="600 18px 'DM Sans',sans-serif";x.fillText("KIROKU · "+(state.user?.username||"MEMBER"),36,H-24);
+ cv.toBlob(blob=>{if(blob)kxOpenImage(blob,"kiroku-"+(t.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")||"tiers"));else showToast("Could not create the image.");},"image/png");
+}
+function kxOpenDuel(){if(state.anime.length<2){showToast("Add at least two anime first.");return;}kxDuel={score:{},n:{},rounds:0,last:"",current:[],busy:false};state.anime.forEach(a=>{kxDuel.score[a.id]=1000;kxDuel.n[a.id]=0;});openModal("kxDuelModal");kxNextDuel();}
+function kxNextDuel(){if(!kxDuel)return;const pool=state.anime.slice().sort((a,b)=>(kxDuel.n[a.id]-kxDuel.n[b.id])||(Math.random()-.5)),a=pool[0];let cands=pool.slice(1,6),fresh=cands.filter(b=>a.id+"|"+b.id!==kxDuel.last&&b.id+"|"+a.id!==kxDuel.last);if(fresh.length)cands=fresh;const b=cands[Math.floor(Math.random()*cands.length)];kxDuel.current=[a,b];kxDuel.last=a.id+"|"+b.id;kxDuel.busy=false;$("kxDuelBox").innerHTML=[a,b].map((it,i)=>`<button class="kx-duel-card" type="button" data-kx-side="${i}"><span class="kx-duel-poster">${cleanImg(it.image)?`<img class="cover" src="${esc(it.image)}" alt="" loading="lazy" data-id="${esc(it.id)}">`:`<b>${esc(Array.from(it.title)[0]||"?")}</b>`}</span><strong>${esc(it.title)}</strong></button>`).join("")+`<span class="kx-vs">VS</span>`;$("kxDuelRound").textContent="Round "+(kxDuel.rounds+1);$("kxDuelApply").disabled=kxDuel.rounds<1;}
+$("kxDuelBox").addEventListener("click",e=>{const b=e.target.closest("[data-kx-side]");if(!b||!kxDuel||kxDuel.busy)return;kxDuel.busy=true;const win=kxDuel.current[+b.dataset.kxSide],lose=kxDuel.current[1-(+b.dataset.kxSide)],expected=1/(1+Math.pow(10,(kxDuel.score[lose.id]-kxDuel.score[win.id])/400));kxDuel.score[win.id]+=32*(1-expected);kxDuel.score[lose.id]-=32*(1-expected);kxDuel.n[win.id]++;kxDuel.n[lose.id]++;kxDuel.rounds++;b.classList.add("winner");const other=$("kxDuelBox").querySelector(`[data-kx-side="${1-(+b.dataset.kxSide)}"]`);if(other)other.classList.add("loser");kxBump("duels");setTimeout(()=>{if(kxDuel&&$("kxDuelModal").classList.contains("open"))kxNextDuel();},420);});
+$("kxDuelApply").addEventListener("click",()=>{if(!kxDuel||kxDuel.rounds<1)return;const idx=new Map(state.anime.map((a,i)=>[a.id,i]));state.anime.sort((a,b)=>(kxDuel.score[b.id]-kxDuel.score[a.id])||(idx.get(a.id)-idx.get(b.id)));state.sort="rank";$("sortSelect").value="rank";$("sortSelect2").value="rank";state.search="";$("searchInput").value="";$("searchInput2").value="";void saveList();renderAll();closeModal("kxDuelModal");showToast("Your ranking has been updated.");});
+const ROLL_STATUSES=["plan_to_watch","watching","on_hold","completed","dropped"];
+function kxNormalizeRollPrefs(raw){
+ const src=(raw&&typeof raw==="object")?raw:{};
+ const statuses={plan_to_watch:true,watching:true,on_hold:true,completed:false,dropped:false};
+ ROLL_STATUSES.forEach(k=>{if(typeof src.statuses?.[k]==="boolean")statuses[k]=src.statuses[k];});
+ return {statuses,favoritesOnly:src.favoritesOnly===true,avoidRecent:src.avoidRecent!==false};
+}
+let kxRollPrefs=kxNormalizeRollPrefs(getJSON("kiroku_roll_prefs",null));
+let kxLastRollId="";
+function kxRollPool(){
+ const pool=state.anime.filter(a=>{
+  const status=a.status||"plan_to_watch";
+  return kxRollPrefs.statuses[status]!==false&&(!kxRollPrefs.favoritesOnly||a.favorite);
+ });
+ if(kxRollPrefs.avoidRecent&&pool.length>1){
+  const fresh=pool.filter(a=>a.id!==kxLastRollId);
+  if(fresh.length)return fresh;
+ }
+ return pool;
+}
+function kxSyncRollUI(){
+ const pool=kxRollPool();
+ document.querySelectorAll("#kxRollFilters [data-roll-status]").forEach(b=>b.classList.toggle("active",kxRollPrefs.statuses[b.dataset.rollStatus]!==false));
+ document.querySelectorAll("#kxRollFilters [data-roll-extra]").forEach(b=>b.classList.toggle("active",kxRollPrefs[b.dataset.rollExtra]===true));
+ const meta=$("kxRollMeta");
+ if(meta)meta.innerHTML=`<b>${pool.length}</b> title${pool.length===1?"":"s"} eligible · completed and dropped stay off unless you turn them on.`;
+ return pool;
+}
+function kxRoll(){
+ clearTimeout(kxRollTimer);
+ const box=$("kxRollResult");
+ if(!state.anime.length){showToast("Your list is empty.");openModal("kxRollModal");box.innerHTML='<div class="empty">Add anime first.</div>';$("kxRollAgain").disabled=true;return;}
+ const pool=kxSyncRollUI();
+ if(!pool.length){openModal("kxRollModal");box.innerHTML='<div class="empty">No titles match these filters. Turn on another status.</div>';$("kxRollAgain").disabled=true;return;}
+ openModal("kxRollModal");
+ const final=pool[Math.floor(Math.random()*pool.length)];
+ let i=0,steps=isLite()?0:12;
+ $("kxRollAgain").disabled=true;
+ const done=()=>{
+  box.innerHTML=`<div class="kx-roll-card"><div class="kx-roll-poster">${cleanImg(final.image)?`<img class="cover" src="${esc(final.image)}" alt="" data-id="${esc(final.id)}">`:`<b>${esc(Array.from(final.title)[0]||"?")}</b>`}</div><div><div class="eyebrow">FATE HAS CHOSEN</div><h3>${esc(final.title)}</h3><p>${esc(final.note||"")}</p><small>${esc(statusLabel(final.status).toUpperCase())} · ${esc(final.tag||"PERSONAL PICK")}</small></div></div>`;
+  kxLastRollId=final.id;$("kxRollAgain").disabled=false;kxBump("rolls");kxSyncRollUI();
+ };
+ const tick=()=>{if(i>=steps){done();return;}box.innerHTML=`<div class="kx-roll-spin">${esc(pool[Math.floor(Math.random()*pool.length)].title)}</div>`;i++;kxRollTimer=setTimeout(tick,55+i*14);};
+ tick();
+}
+$("kxRollFilters").addEventListener("click",e=>{
+ const b=e.target.closest("[data-roll-status],[data-roll-extra]");if(!b)return;
+ if(b.dataset.rollStatus){const k=b.dataset.rollStatus;kxRollPrefs.statuses[k]=kxRollPrefs.statuses[k]===false;}
+ else{const k=b.dataset.rollExtra;kxRollPrefs[k]=!kxRollPrefs[k];}
+ setJSON("kiroku_roll_prefs",kxRollPrefs);kxSyncRollUI();
+});
+$("kxRollAgain").addEventListener("click",kxRoll);
+document.addEventListener("click",e=>{const topic=e.target.closest("[data-kx-topic]");if(topic)return;const a=e.target.closest("[data-kx-action]");if(!a)return;switch(a.dataset.kxAction){case"new-topic":kxOpenTopic();break;case"edit-topic":if(kxTopic())kxOpenTopic(kxTopic().id);break;case"add-char":kxOpenChar();break;case"reset-tiers":if(kxTopic()&&confirm("Move every character to Unranked?")){kxTopic().chars.forEach(c=>c.tier="");kxSaveTiers();}break;case"export-tiers":kxExportTiers();break;case"duel":kxOpenDuel();break;case"roll":kxRoll();break;case"top5":kxExportTop5();break;}});
+// Existing easter egg button now also unlocks the Original's Projection Sorcery trophy.
+const kxEggButton=document.querySelector('[data-do="easter"]');if(kxEggButton)kxEggButton.addEventListener("click",e=>{e.stopPropagation();kxBump("egg");showToast("Projection Sorcery · 24 FPS. Naoya approves.");});
+// Count real theme changes, not the initial theme load.
+const kxOriginalPickTheme=pickTheme;pickTheme=function(theme){const before=document.documentElement.getAttribute("data-theme");kxOriginalPickTheme(theme);if(before!==theme)kxBump("themes");};
+// Export / import include character boards and achievements in the same portable JSON backup.
+exportList=function(){if(!state.user){showToast("Log in first.");return;}const payload={app:"KIROKU",version:4,exported:new Date().toISOString(),user:state.user.username,anime:state.anime,extras:kxData};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="kiroku-"+state.user.username+"-backup.json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1200);showToast("Full KIROKU backup exported.");};
+
 /* ---------------- Boot ---------------- */
 // One-time hint when Lite mode was switched on automatically for this device.
 function liteNotice(){
@@ -1284,14 +1939,14 @@ function liteNotice(){
  rawSet("kiroku_lite_told", "1");
  setTimeout(() => showToast("Lite mode is on for smoother speed. Change it in Premium → Themes."), 2200);
 }
-getUsers();
 syncLiteUI();
 loadFigure();
-loadAccount();
-if (state.user) liteNotice();
+loadAccount().then(() => { state.authBooted = true; if (state.user) liteNotice(); });
 moveNavIndicator();
 icons();
 window.addEventListener("load", icons);   // lucide is loaded with `defer`, so draw icons again once it is ready
 </script>
+
+
 </body>
 </html>
